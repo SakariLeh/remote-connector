@@ -1,13 +1,12 @@
-import jwt
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 
-from backend_app.identity_microservice.entities.user_entity import UserEntity
-from backend_app.identity_microservice.repositories.user_repository import UserRepository
 from backend_app.identity_microservice.DTO.Request.user_create_dto import UserCreateDTO
 from backend_app.identity_microservice.DTO.Response.user_response_dto import UserResponseDTO
+from backend_app.identity_microservice.entities.user_entity import UserEntity
+from backend_app.identity_microservice.repositories.user_repository import UserRepository
 
 
+# TODO: заменить на GenericService[TCreateDTO, TResponseDTO, TRepository]
 class IdentityService:
     def __init__(self, user_repository: UserRepository):
         self.user_repo = user_repository
