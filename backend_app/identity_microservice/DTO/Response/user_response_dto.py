@@ -1,5 +1,8 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 
+__all__ = ["UserResponseDTO"]
+
+
 class UserResponseDTO(BaseModel):
     id: int
     email: EmailStr

@@ -1,0 +1,38 @@
+---
+description: Однозначные импорты и явные экспорты в Python-коде backend
+globs: **/*.py
+alwaysApply: false
+---
+
+# Импорты и экспорты (Python)
+
+## Пакеты и `__init__.py`
+
+- У каждой папки-пакета есть `__init__.py` с публичным фасадом (`__all__` + ленивый `__getattr__`)
+- Снаружи слоя импортировать **только через пакет**, не через файл модуля:
+
+```python
+# ❌ BAD — обращение через модуль-файл
+from backend_app.identity_microservice.repositories.user_repository import UserRepository
+
+# ✅ GOOD — через фасад пакета
+from backend_app.identity_microservice.repositories import UserRepository
+from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
+```
+
+- Внутри своего же пакета **не** импортировать из собственного `__init__.py` (частичная инициализация → цикл). Импортировать соседний leaf-модуль напрямую только из `__init__.py` фасада
+- Фасады слоёв — ленивые (`TYPE_CHECKING` + `__getattr__`), чтобы разрывать циклы repositories ↔ services ↔ controllers
+- Корень микросервиса (`identity_microservice/__init__.py`) **не** реэкспортирует слои целиком
+
+## Импорты
+
+- Только абсолютные от `backend_app.<microservice>...`
+- Запрещены короткие (`from repositories...`), относительные (`from .` / `from ..`) и `import *`
+- Порядок: stdlib → third-party → локальные; внутри блока — алфавит
+
+## Экспорты
+
+- Публичный API модуля: `__all__ = [...]`
+- Публичный API пакета: тот же список в `__init__.py` (лениво)
+- Внутреннее — префикс `_`; не в `__all__`, не импортировать снаружи
+- Один публичный класс репозитория/сервиса/DTO на файл; имя файла = сущность

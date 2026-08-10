@@ -1,6 +1,8 @@
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+__all__ = ["Base", "UserEntity"]
+
 
 # TODO: вынести Base в generic db_context (общий DeclarativeBase для всех entity)
 class Base(DeclarativeBase):

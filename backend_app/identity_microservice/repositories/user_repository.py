@@ -3,8 +3,10 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.identity_microservice.DTO.Response.user_response_dto import UserResponseDTO
-from backend_app.identity_microservice.entities.user_entity import UserEntity
+from backend_app.identity_microservice.DTO import UserResponseDTO
+from backend_app.identity_microservice.entities import UserEntity
+
+__all__ = ["UserRepository"]
 
 
 # TODO: заменить на GenericRepository[TEntity, TResponseDTO]
