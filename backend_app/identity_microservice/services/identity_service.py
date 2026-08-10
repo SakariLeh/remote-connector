@@ -1,4 +1,7 @@
+import secrets
+
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
 from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
 from backend_app.identity_microservice.entities import UserEntity
@@ -24,3 +27,24 @@ class IdentityService:
         created_user = await self.user_repo.create_user(new_user)
 
         return created_user
+
+    async def authorize_user(self, email: str, password: str) -> str:
+        """Authorize a user and return an auth token.
+
+        Raise ValueError for missing user, invalid password or other failures.
+        """
+        try:
+            user = await self.user_repo.get_user_by_email(email)
+            if not user:
+                raise ValueError("User not found")
+
+            try:
+                self.ph.verify(user.hashed_password, password)
+            except VerifyMismatchError:
+                raise ValueError("Invalid password") from None
+
+            return secrets.token_urlsafe(32)
+        except ValueError:
+            raise
+        except Exception as error:
+            raise ValueError("Authorization failed") from error
