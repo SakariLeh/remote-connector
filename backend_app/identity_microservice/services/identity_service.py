@@ -1,18 +1,19 @@
-import secrets
-
+import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
-from backend_app.identity_microservice.DTO.Request.user_auth_dto import UserAuthDTO
-from backend_app.identity_microservice.DTO.Response.jwt_response_dto import JwtResponseDTO
+from backend_app.identity_microservice.DTO import (
+    JwtResponseDTO,
+    UserAuthDTO,
+    UserCreateDTO,
+    UserResponseDTO,
+)
 from backend_app.identity_microservice.entities import UserEntity
 from backend_app.identity_microservice.repositories import UserRepository
 
 __all__ = ["IdentityService"]
 
 
-# TODO: заменить на GenericService[TCreateDTO, TResponseDTO, TRepository]
 class IdentityService:
     def __init__(self, user_repository: UserRepository):
         self.user_repo = user_repository
@@ -31,20 +32,17 @@ class IdentityService:
         return created_user
 
     async def authorize_user(self, auth_dto: UserAuthDTO) -> JwtResponseDTO:
-        """Authorize a user and return an auth token.
-
-        Raise ValueError for missing user, invalid password or other failures.
-        """
+        """Authorize a user and return a JWT wrapped in JwtResponseDTO."""
         try:
-            user = await self.user_repo.get_user_by_email(auth_dto.email)
+            user = await self.user_repo.get_user_entity_by_email(auth_dto.email)
             if not user:
                 raise ValueError("User not found")
 
             try:
-                self.ph.verify(user.hashed_password, password)
+                self.ph.verify(user.hashed_password, auth_dto.password)
             except VerifyMismatchError:
                 raise ValueError("Invalid password") from None
-            
+
             jwt_token = jwt.encode(
                 {
                     "sub": user.id,
@@ -56,10 +54,38 @@ class IdentityService:
                 "secret",
                 algorithm="HS256",
             )
-            response = JwtResponseDTO(id=user.id, email=user.email, jwt_token=jwt_token)
-
-            return response
+            return JwtResponseDTO(id=user.id, email=user.email, jwt_token=jwt_token)
         except ValueError:
             raise
         except Exception as error:
             raise ValueError("Authorization failed") from error
+
+    async def get_user_by_id(self, user_id: int) -> UserResponseDTO | None:
+        return await self.user_repo.get_user_by_id(user_id)
+
+    async def get_user_by_email(self, email: str) -> UserResponseDTO | None:
+        return await self.user_repo.get_user_by_email(email)
+
+    async def get_all_users(self) -> list[UserResponseDTO]:
+        return list(await self.user_repo.get_all_users())
+
+    async def update_user(
+        self,
+        user_id: int,
+        email: str | None = None,
+        password: str | None = None,
+        role: str | None = None,
+    ) -> UserResponseDTO | None:
+        kwargs: dict = {}
+        if email is not None:
+            kwargs["email"] = email
+        if password is not None:
+            kwargs["hashed_password"] = self.ph.hash(password)
+        if role is not None:
+            kwargs["role"] = role
+        if not kwargs:
+            return await self.user_repo.get_user_by_id(user_id)
+        return await self.user_repo.update_user(user_id, **kwargs)
+
+    async def delete_user(self, user_id: int) -> bool:
+        return await self.user_repo.delete_user(user_id)

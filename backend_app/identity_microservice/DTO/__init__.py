@@ -2,22 +2,22 @@
 
 from typing import TYPE_CHECKING, Any
 
-__all__ = ["UserCreateDTO", "UserResponseDTO"]
+__all__ = ["JwtResponseDTO", "UserAuthDTO", "UserCreateDTO", "UserResponseDTO"]
 
 if TYPE_CHECKING:
-    from backend_app.identity_microservice.DTO.Request import UserCreateDTO
-    from backend_app.identity_microservice.DTO.Response import UserResponseDTO
+    from backend_app.identity_microservice.DTO.Request import UserAuthDTO, UserCreateDTO
+    from backend_app.identity_microservice.DTO.Response import JwtResponseDTO, UserResponseDTO
 
 
 def __getattr__(name: str) -> Any:
-    if name == "UserCreateDTO":
-        from backend_app.identity_microservice.DTO.Request import UserCreateDTO
+    if name in {"UserAuthDTO", "UserCreateDTO"}:
+        from backend_app.identity_microservice.DTO import Request as _request
 
-        return UserCreateDTO
-    if name == "UserResponseDTO":
-        from backend_app.identity_microservice.DTO.Response import UserResponseDTO
+        return getattr(_request, name)
+    if name in {"JwtResponseDTO", "UserResponseDTO"}:
+        from backend_app.identity_microservice.DTO import Response as _response
 
-        return UserResponseDTO
+        return getattr(_response, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 

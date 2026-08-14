@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
-from backend_app.identity_microservice.DTO.Request.user_auth_dto import UserAuthDTO
-from backend_app.identity_microservice.DTO.Response.jwt_response_dto import JwtResponseDTO
+from backend_app.identity_microservice.DTO import (
+    JwtResponseDTO,
+    UserAuthDTO,
+    UserCreateDTO,
+    UserResponseDTO,
+)
 from backend_app.identity_microservice.db_context import get_db
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.services import IdentityService

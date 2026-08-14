@@ -20,9 +20,13 @@ class UserRepository:
         return UserResponseDTO.model_validate(user) if user else None
 
     async def get_user_by_email(self, email: str) -> UserResponseDTO | None:
-        result = await self.db.execute(select(UserEntity).where(UserEntity.email == email))
-        user = result.scalar_one_or_none()
+        user = await self.get_user_entity_by_email(email)
         return UserResponseDTO.model_validate(user) if user else None
+
+    async def get_user_entity_by_email(self, email: str) -> UserEntity | None:
+        """Entity for auth (hashed_password). Not exposed via response DTO."""
+        result = await self.db.execute(select(UserEntity).where(UserEntity.email == email))
+        return result.scalar_one_or_none()
 
     async def get_all_users(self) -> Sequence[UserResponseDTO]:
         result = await self.db.execute(select(UserEntity))
@@ -33,3 +37,24 @@ class UserRepository:
         await self.db.commit()
         await self.db.refresh(user)
         return UserResponseDTO.model_validate(user)
+
+    async def update_user(self, user_id: int, **kwargs) -> UserResponseDTO | None:
+        result = await self.db.execute(select(UserEntity).where(UserEntity.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user:
+            return None
+        for key, value in kwargs.items():
+            if hasattr(user, key) and value is not None:
+                setattr(user, key, value)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return UserResponseDTO.model_validate(user)
+
+    async def delete_user(self, user_id: int) -> bool:
+        result = await self.db.execute(select(UserEntity).where(UserEntity.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user:
+            return False
+        self.db.delete(user)
+        await self.db.commit()
+        return True
