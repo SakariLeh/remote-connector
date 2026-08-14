@@ -1,7 +1,3 @@
-"""Identity microservice package.
-
-Публичный API микросервиса — через подпакеты (controllers, services, ...).
-Сам пакет намеренно не реэкспортирует слои, чтобы не тянуть циклы при импорте main.
-"""
+"""Identity microservice — публичный API через подпакеты."""
 
 __all__: list[str] = []

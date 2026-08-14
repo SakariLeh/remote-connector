@@ -19,6 +19,10 @@ class UserRepository:
         user = result.scalar_one_or_none()
         return UserResponseDTO.model_validate(user) if user else None
 
+    async def get_user_entity_by_id(self, user_id: int) -> UserEntity | None:
+        result = await self.db.execute(select(UserEntity).where(UserEntity.id == user_id))
+        return result.scalar_one_or_none() if result.scalar_one_or_none() else None
+
     async def get_user_by_email(self, email: str) -> UserResponseDTO | None:
         user = await self.get_user_entity_by_email(email)
         return UserResponseDTO.model_validate(user) if user else None
@@ -38,21 +42,13 @@ class UserRepository:
         await self.db.refresh(user)
         return UserResponseDTO.model_validate(user)
 
-    async def update_user(self, user_id: int, **kwargs) -> UserResponseDTO | None:
-        result = await self.db.execute(select(UserEntity).where(UserEntity.id == user_id))
-        user = result.scalar_one_or_none()
-        if not user:
-            return None
-        for key, value in kwargs.items():
-            if hasattr(user, key) and value is not None:
-                setattr(user, key, value)
+    async def update_user(self, user: UserEntity) -> UserResponseDTO | None:
         await self.db.commit()
         await self.db.refresh(user)
         return UserResponseDTO.model_validate(user)
 
     async def delete_user(self, user_id: int) -> bool:
-        result = await self.db.execute(select(UserEntity).where(UserEntity.id == user_id))
-        user = result.scalar_one_or_none()
+        user = await self.get_user_entity_by_id(user_id)
         if not user:
             return False
         self.db.delete(user)

@@ -8,31 +8,41 @@ alwaysApply: false
 
 ## Пакеты и `__init__.py`
 
-- У каждой папки-пакета есть `__init__.py` с публичным фасадом (`__all__` + ленивый `__getattr__`)
-- Снаружи слоя импортировать **только через пакет**, не через файл модуля:
+- Фасад пакета — простые реэкспорты из модулей/подпапок этой же папки:
 
 ```python
-# ❌ BAD — обращение через модуль-файл
+# repositories/__init__.py
+from .user_repository import UserRepository
+__all__ = ["UserRepository"]
+
+# DTO/__init__.py
+from .Request import UserAuthDTO, UserCreateDTO
+from .Response import JwtResponseDTO, UserResponseDTO
+```
+
+- Снаружи слоя импортировать **только через пакет**:
+
+```python
+# ❌ BAD
 from backend_app.identity_microservice.repositories.user_repository import UserRepository
 
-# ✅ GOOD — через фасад пакета
+# ✅ GOOD
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
 ```
 
-- Внутри своего же пакета **не** импортировать из собственного `__init__.py` (частичная инициализация → цикл). Импортировать соседний leaf-модуль напрямую только из `__init__.py` фасада
-- Фасады слоёв — ленивые (`TYPE_CHECKING` + `__getattr__`), чтобы разрывать циклы repositories ↔ services ↔ controllers
-- Корень микросервиса (`identity_microservice/__init__.py`) **не** реэкспортирует слои целиком
+- Relative (`from .`) — **только** в `__init__.py` фасадах
+- В leaf-модулях не импортировать из собственного `__init__.py`
+- Корень микросервиса не реэкспортирует слои целиком
 
-## Импорты
+## Импорты (вне `__init__.py`)
 
 - Только абсолютные от `backend_app.<microservice>...`
-- Запрещены короткие (`from repositories...`), относительные (`from .` / `from ..`) и `import *`
-- Порядок: stdlib → third-party → локальные; внутри блока — алфавит
+- Без коротких (`from repositories...`), без `from ..`, без `import *`
+- Порядок: stdlib → third-party → локальные
 
 ## Экспорты
 
-- Публичный API модуля: `__all__ = [...]`
-- Публичный API пакета: тот же список в `__init__.py` (лениво)
-- Внутреннее — префикс `_`; не в `__all__`, не импортировать снаружи
-- Один публичный класс репозитория/сервиса/DTO на файл; имя файла = сущность
+- Модуль и пакет: явный `__all__`
+- Внутреннее — префикс `_`
+- Один публичный класс на файл; имя файла = сущность

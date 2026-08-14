@@ -59,33 +59,3 @@ class IdentityService:
             raise
         except Exception as error:
             raise ValueError("Authorization failed") from error
-
-    async def get_user_by_id(self, user_id: int) -> UserResponseDTO | None:
-        return await self.user_repo.get_user_by_id(user_id)
-
-    async def get_user_by_email(self, email: str) -> UserResponseDTO | None:
-        return await self.user_repo.get_user_by_email(email)
-
-    async def get_all_users(self) -> list[UserResponseDTO]:
-        return list(await self.user_repo.get_all_users())
-
-    async def update_user(
-        self,
-        user_id: int,
-        email: str | None = None,
-        password: str | None = None,
-        role: str | None = None,
-    ) -> UserResponseDTO | None:
-        kwargs: dict = {}
-        if email is not None:
-            kwargs["email"] = email
-        if password is not None:
-            kwargs["hashed_password"] = self.ph.hash(password)
-        if role is not None:
-            kwargs["role"] = role
-        if not kwargs:
-            return await self.user_repo.get_user_by_id(user_id)
-        return await self.user_repo.update_user(user_id, **kwargs)
-
-    async def delete_user(self, user_id: int) -> bool:
-        return await self.user_repo.delete_user(user_id)
