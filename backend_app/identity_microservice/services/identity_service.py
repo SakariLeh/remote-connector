@@ -4,6 +4,8 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
+from backend_app.identity_microservice.DTO.Request.user_auth_dto import UserAuthDTO
+from backend_app.identity_microservice.DTO.Response.jwt_response_dto import JwtResponseDTO
 from backend_app.identity_microservice.entities import UserEntity
 from backend_app.identity_microservice.repositories import UserRepository
 
@@ -28,13 +30,13 @@ class IdentityService:
 
         return created_user
 
-    async def authorize_user(self, email: str, password: str) -> str:
+    async def authorize_user(self, auth_dto: UserAuthDTO) -> JwtResponseDTO:
         """Authorize a user and return an auth token.
 
         Raise ValueError for missing user, invalid password or other failures.
         """
         try:
-            user = await self.user_repo.get_user_by_email(email)
+            user = await self.user_repo.get_user_by_email(auth_dto.email)
             if not user:
                 raise ValueError("User not found")
 
@@ -42,8 +44,21 @@ class IdentityService:
                 self.ph.verify(user.hashed_password, password)
             except VerifyMismatchError:
                 raise ValueError("Invalid password") from None
+            
+            jwt_token = jwt.encode(
+                {
+                    "sub": user.id,
+                    "email": user.email,
+                    "role": user.role,
+                },
+                # TODO: Заменить на соль из .env
+                # settings.JWT_SECRET,
+                "secret",
+                algorithm="HS256",
+            )
+            response = JwtResponseDTO(id=user.id, email=user.email, jwt_token=jwt_token)
 
-            return secrets.token_urlsafe(32)
+            return response
         except ValueError:
             raise
         except Exception as error:
