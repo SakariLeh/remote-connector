@@ -10,7 +10,6 @@ from backend_app.identity_microservice.repositories import UserRepository
 __all__ = ["IdentityService"]
 
 
-# TODO: заменить на GenericService[TCreateDTO, TResponseDTO, TRepository]
 class IdentityService:
     def __init__(self, user_repository: UserRepository):
         self.user_repo = user_repository
@@ -29,14 +28,10 @@ class IdentityService:
         return created_user
 
     async def authorize_user(self, email: str, password: str) -> str:
-        """Authorize a user and return an auth token.
-
-        Raise ValueError for missing user, invalid password or other failures.
-        """
         try:
             user = await self.user_repo.get_user_by_email(email)
             if not user:
-                raise ValueError("User not found")
+                raise ValueError("User nor found")
 
             try:
                 self.ph.verify(user.hashed_password, password)
@@ -48,3 +43,27 @@ class IdentityService:
             raise
         except Exception as error:
             raise ValueError("Authorization failed") from error
+
+    async def get_user_by_id(self, user_id: int) -> UserResponseDTO | None:
+        return await self.user_repo.get_user_by_id(user_id)
+
+    async def get_user_by_email(self, email: str) -> UserResponseDTO | None:
+        return await self.user_repo.get_user_by_email(email)
+
+    async def get_all_users(self):
+        return await self.user_repo.get_all_users()
+
+    async def update_user(self, user_id: int, email: str | None = None, password: str | None = None, role: str | None = None) -> UserResponseDTO | None:
+        kwargs = {}
+        if email is not None:
+            kwargs["email"] = email
+        if password is not None:
+            kwargs["hashed_password"] = self.ph.hash(password)
+        if role is not None:
+            kwargs["role"] = role
+        if not kwargs:
+            return await self.user_repo.get_user_by_id(user_id)
+        return await self.user_repo.update_user(user_id, **kwargs)
+
+    async def delete_user(self, user_id: int) -> bool:
+        return await self.user_repo.delete_user(user_id)
