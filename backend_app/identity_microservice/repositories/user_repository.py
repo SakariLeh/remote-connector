@@ -21,7 +21,7 @@ class UserRepository:
 
     async def get_user_entity_by_id(self, user_id: int) -> UserEntity | None:
         result = await self.db.execute(select(UserEntity).where(UserEntity.id == user_id))
-        return result.scalar_one_or_none() if result.scalar_one_or_none() else None
+        return result.scalar_one_or_none()
 
     async def get_user_by_email(self, email: str) -> UserResponseDTO | None:
         user = await self.get_user_entity_by_email(email)
@@ -51,6 +51,6 @@ class UserRepository:
         user = await self.get_user_entity_by_id(user_id)
         if not user:
             return False
-        self.db.delete(user)
+        await self.db.delete(user)
         await self.db.commit()
         return True

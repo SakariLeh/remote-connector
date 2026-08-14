@@ -1,10 +1,10 @@
 from pydantic import BaseModel, EmailStr
 
-__all__ = ["UserDTO"]
+__all__ = ["UserRequestDTO"]
 
 
 class UserRequestDTO(BaseModel):
     id: int
     email: EmailStr | None = None
     password: str | None = None
-    role: str | None = "unauthorized"
+    role: str | None = None

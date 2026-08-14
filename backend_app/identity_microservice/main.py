@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from backend_app.identity_microservice.controllers import auth_router
+from backend_app.identity_microservice.controllers import auth_router, profile_router
 from backend_app.identity_microservice.db_context import engine
 from backend_app.identity_microservice.entities import Base
 
@@ -29,6 +29,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(profile_router)
 # TODO: подключать роутеры generic-способом (автосбор / registry)
 
 
