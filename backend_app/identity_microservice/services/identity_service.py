@@ -1,4 +1,3 @@
-import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
@@ -9,6 +8,7 @@ from backend_app.identity_microservice.DTO import (
     UserResponseDTO,
 )
 from backend_app.identity_microservice.entities import UserEntity
+from backend_app.identity_microservice.middlewares import create_access_token
 from backend_app.identity_microservice.repositories import UserRepository
 
 __all__ = ["IdentityService"]
@@ -43,17 +43,7 @@ class IdentityService:
             except VerifyMismatchError:
                 raise ValueError("Invalid password") from None
 
-            jwt_token = jwt.encode(
-                {
-                    "sub": user.id,
-                    "email": user.email,
-                    "role": user.role,
-                },
-                # TODO: Заменить на соль из .env
-                # settings.JWT_SECRET,
-                "secret",
-                algorithm="HS256",
-            )
+            jwt_token = create_access_token(user.id, user.email, user.role)
             return JwtResponseDTO(id=user.id, email=user.email, jwt_token=jwt_token)
         except ValueError:
             raise

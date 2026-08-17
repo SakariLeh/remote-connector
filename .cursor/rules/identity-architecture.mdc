@@ -1,0 +1,28 @@
+---
+description: Слои identity-микросервиса и JWT как FastAPI Depends
+globs: backend_app/identity_microservice/**/*.py
+alwaysApply: false
+---
+
+# Identity: слои и JWT
+
+Поток: `controllers` → `services` → `repositories` → `entities` / `db_context`.
+Cross-cutting: `middlewares` (JWT), `DTO` (контракт API). Не класть auth в `utils/`.
+
+Снаружи слоя импорт только через фасад пакета (`from ...middlewares import get_current_user`).
+
+## JWT — FastAPI Depends, не Starlette middleware
+
+- `/auth/*` публичный (в Swagger без замка)
+- защищённый роутер: `APIRouter(..., dependencies=[Depends(get_current_user)])` — замок JWT в Swagger
+- выпуск токена: `create_access_token` из `middlewares` (один секрет/алгоритм)
+
+```python
+# ❌ BAD — точечный Depends на одной ручке, encode со своим секретом
+@profile_router.get("/{user_id}")
+async def get_user(..., current_user: CurrentUser = Depends(CurrentUser.get_current_user)): ...
+
+# ✅ GOOD
+profile_router = APIRouter(prefix="/profile", dependencies=[Depends(get_current_user)])
+jwt_token = create_access_token(user.id, user.email, user.role)
+```

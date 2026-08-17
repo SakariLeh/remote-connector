@@ -23,9 +23,13 @@ async def _lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="Identity Microservice",
-    description="Authentication and identity management API",
+    description=(
+        "Authentication and identity management API. "
+        "Protected routes: Authorize in Swagger with JWT from POST /auth/authorize."
+    ),
     version="0.1.0",
     lifespan=_lifespan,
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
 app.include_router(auth_router)
