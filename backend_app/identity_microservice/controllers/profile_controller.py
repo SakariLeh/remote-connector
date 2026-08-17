@@ -61,3 +61,15 @@ async def delete_user(
     deleted = await service.delete_user(user_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+@profile_router.get(
+    "/",
+    response_model=list[UserResponseDTO],
+    status_code=status.HTTP_200_OK,
+    summary="Get all users",
+    response_description="List of all users",
+)
+async def get_users(
+    service: UserService = Depends(_get_user_service),
+) -> list[UserResponseDTO]:
+    return await service.get_all_users()
