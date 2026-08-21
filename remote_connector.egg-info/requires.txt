@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+aiosqlite
+argon2-cffi
+email-validator
+pydantic
+PyJWT

@@ -1,0 +1,48 @@
+---
+description: Однозначные импорты и явные экспорты в Python-коде backend
+globs: **/*.py
+alwaysApply: false
+---
+
+# Импорты и экспорты (Python)
+
+## Пакеты и `__init__.py`
+
+- Фасад пакета — простые реэкспорты из модулей/подпапок этой же папки:
+
+```python
+# repositories/__init__.py
+from .user_repository import UserRepository
+__all__ = ["UserRepository"]
+
+# DTO/__init__.py
+from .Request import UserAuthDTO, UserCreateDTO
+from .Response import JwtResponseDTO, UserResponseDTO
+```
+
+- Снаружи слоя импортировать **только через пакет**:
+
+```python
+# ❌ BAD
+from backend_app.identity_microservice.repositories.user_repository import UserRepository
+
+# ✅ GOOD
+from backend_app.identity_microservice.repositories import UserRepository
+from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
+```
+
+- Relative (`from .`) — **только** в `__init__.py` фасадах
+- В leaf-модулях не импортировать из собственного `__init__.py`
+- Корень микросервиса не реэкспортирует слои целиком
+
+## Импорты (вне `__init__.py`)
+
+- Только абсолютные от `backend_app.<microservice>...`
+- Без коротких (`from repositories...`), без `from ..`, без `import *`
+- Порядок: stdlib → third-party → локальные
+
+## Экспорты
+
+- Модуль и пакет: явный `__all__`
+- Внутреннее — префикс `_`
+- Один публичный класс на файл; имя файла = сущность
