@@ -7,7 +7,6 @@ from backend_app.identity_microservice.middlewares import get_current_user
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.services import UserService
 
-__all__ = ["profile_router"]
 
 profile_router = APIRouter(
     prefix="/profile",
@@ -78,3 +77,15 @@ async def get_users(
     service: UserService = Depends(_get_user_service),
 ) -> list[UserResponseDTO]:
     return await service.get_all_users()
+
+
+@profile_router.get("/me", response_model=UserResponseDTO, status_code=status.HTTP_200_OK, summary="Get current user profile", response_description="Current user profile")
+async def get_current_user(service: UserService = Depends(_get_user_service)) -> UserResponseDTO:
+    try:
+        return await service.get_current_user()
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e

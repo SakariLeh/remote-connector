@@ -6,8 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend_app.identity_microservice.DTO import UserResponseDTO
 from backend_app.identity_microservice.entities import UserEntity
 
-__all__ = ["UserRepository"]
-
 
 # TODO: заменить на GenericRepository[TEntity, TResponseDTO]
 class UserRepository:

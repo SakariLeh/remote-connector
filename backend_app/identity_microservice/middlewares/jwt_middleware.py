@@ -1,16 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from typing import Annotated
 
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
-__all__ = [
-    "CurrentUser",
-    "RoleChecker",
-    "create_access_token",
-    "get_current_user",
-]
 
 # ponytail: hardcoded secret, move to settings/.env when shared config exists
 JWT_SECRET = "SUPER_SECRET_KEY_CHANGE_ME_NOW!!"
@@ -43,7 +37,7 @@ def create_access_token(user_id: int, email: str, role: str) -> str:
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(jwt_scheme),
+    credentials_or_none: Annotated[HTTPAuthorizationCredentials, Depends(jwt_scheme)] = None
 ) -> CurrentUser:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -51,8 +45,9 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        
         payload = jwt.decode(
-            credentials.credentials,
+            credentials_or_none.credentials,
             JWT_SECRET,
             algorithms=[JWT_ALGORITHM],
         )

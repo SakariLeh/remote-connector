@@ -1,7 +1,5 @@
 from pydantic import BaseModel, Field
 
-__all__ = ["ChangePasswordDTO"]
-
 
 class ChangePasswordDTO(BaseModel):
     old_password: str = Field(min_length=1)

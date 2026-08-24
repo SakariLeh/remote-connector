@@ -37,12 +37,13 @@ from backend_app.identity_microservice.DTO import UserCreateDTO, UserResponseDTO
 
 ## Импорты (вне `__init__.py`)
 
-- Только абсолютные от `backend_app.<microservice>...`
-- Без коротких (`from repositories...`), без `from ..`, без `import *`
+- Только абсолютные от `backend_app.<microservice>...` или `backend_app.shared...`
+- Без коротких (`from repositories...` / `from shared...`), без `from ..`, без `import *`
 - Порядок: stdlib → third-party → локальные
 
 ## Экспорты
 
-- Модуль и пакет: явный `__all__`
+- Явный `__all__` — **только** в `__init__.py` фасадах
+- В leaf-модулях (бизнес-логика) `__all__` не писать
 - Внутреннее — префикс `_`
 - Один публичный класс на файл; имя файла = сущность

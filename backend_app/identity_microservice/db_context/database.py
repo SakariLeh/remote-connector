@@ -2,7 +2,6 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-__all__ = ["DATABASE_URL", "engine", "AsyncSessionLocal", "get_db"]
 
 # TODO: вынести в generic DatabaseContext / фабрику сессий под любой микросервис
 DATABASE_URL = "sqlite+aiosqlite:///./identity.db"

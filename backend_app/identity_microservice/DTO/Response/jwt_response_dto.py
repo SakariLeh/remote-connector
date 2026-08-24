@@ -1,7 +1,5 @@
 from pydantic import BaseModel, EmailStr
 
-__all__ = ["JwtResponseDTO"]
-
 
 class JwtResponseDTO(BaseModel):
     id: int

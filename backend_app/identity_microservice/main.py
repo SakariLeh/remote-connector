@@ -6,8 +6,7 @@ from fastapi import FastAPI
 from backend_app.identity_microservice.controllers import auth_router, profile_router
 from backend_app.identity_microservice.db_context import engine
 from backend_app.identity_microservice.entities import Base
-
-__all__ = ["app"]
+from backend_app.shared.exception_handling import setup_exception_handling
 
 
 # TODO: вынести в generic create_app() фабрику микросервиса (роутеры, lifespan, metadata)
@@ -32,6 +31,8 @@ app = FastAPI(
     swagger_ui_parameters={"persistAuthorization": True},
 )
 
+
+setup_exception_handling(app)
 app.include_router(auth_router)
 app.include_router(profile_router)
 # TODO: подключать роутеры generic-способом (автосбор / registry)

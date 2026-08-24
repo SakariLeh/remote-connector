@@ -1,0 +1,24 @@
+---
+description: Git remote, ветка и ссылки на GitHub при push/pull
+alwaysApply: true
+---
+
+# Git: репозиторий и ветка
+
+Remote: `origin` → https://github.com/SakariLeh/remote-connector.git
+
+Рабочая ветка по умолчанию: `dev-v2` (tracking `origin/dev-v2`).
+`main` — защищённая; не пушить в неё без явной просьбы и не делать force-push.
+
+## Ссылки (всегда показывать после git-операций)
+
+- Репозиторий: https://github.com/SakariLeh/remote-connector
+- Текущая ветка: https://github.com/SakariLeh/remote-connector/tree/<branch>
+- Сравнение с main: https://github.com/SakariLeh/remote-connector/compare/main...<branch>
+
+## Push / pull
+
+- Перед работой: `git pull` (fast-forward only; при расхождении — сказать пользователю).
+- После коммита по просьбе пользователя: `git push -u origin HEAD`.
+- Новые ветки уже получают upstream автоматически (`push.autoSetupRemote`).
+- Не менять `remote.origin.url` и не добавлять второй remote без просьбы.

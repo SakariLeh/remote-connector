@@ -11,8 +11,6 @@ from backend_app.identity_microservice.entities import UserEntity
 from backend_app.identity_microservice.middlewares import create_access_token
 from backend_app.identity_microservice.repositories import UserRepository
 
-__all__ = ["IdentityService"]
-
 
 class IdentityService:
     def __init__(self, user_repository: UserRepository):
@@ -49,3 +47,7 @@ class IdentityService:
             raise
         except Exception as error:
             raise ValueError("Authorization failed") from error
+
+
+    
+    

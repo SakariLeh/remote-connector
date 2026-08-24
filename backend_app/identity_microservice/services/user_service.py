@@ -1,9 +1,8 @@
 from argon2 import PasswordHasher
 
 from backend_app.identity_microservice.DTO import UserRequestDTO, UserResponseDTO
+from backend_app.identity_microservice.middlewares import CurrentUser, get_current_user
 from backend_app.identity_microservice.repositories import UserRepository
-
-__all__ = ["UserService"]
 
 
 class UserService:
@@ -18,7 +17,7 @@ class UserService:
         return await self.user_repo.get_user_by_email(email)
 
     async def get_all_users(self) -> list[UserResponseDTO]:
-        return list(await self.user_repo.get_all_users())
+        return list (await self.user_repo.get_all_users())
 
     async def update_user(self, user: UserRequestDTO) -> UserResponseDTO:
         existing_user = await self.user_repo.get_user_entity_by_id(user.id)
@@ -39,3 +38,11 @@ class UserService:
 
     async def delete_user(self, user_id: int) -> bool:
         return await self.user_repo.delete_user(user_id)
+
+
+    async def get_current_user(self) -> UserResponseDTO:
+        try:
+            user: CurrentUser = await get_current_user()
+            return UserResponseDTO(id=8, email="user2@example.com", role="admin")
+        except ValueError as error:
+            raise ValueError("Failed to get current user") from error
