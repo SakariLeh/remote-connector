@@ -1,8 +1,9 @@
 from argon2 import PasswordHasher
 
 from backend_app.identity_microservice.DTO import UserRequestDTO, UserResponseDTO
-from backend_app.identity_microservice.middlewares import CurrentUser, get_current_user
 from backend_app.identity_microservice.repositories import UserRepository
+
+from backend_app.shared.jwt_authentication import CurrentUser, get_current_user
 
 
 class UserService:

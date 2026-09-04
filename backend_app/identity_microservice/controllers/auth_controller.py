@@ -13,6 +13,7 @@ from backend_app.identity_microservice.services import IdentityService
 from backend_app.shared.jwt_authentication import CurrentUser, get_current_user
 
 
+
 # TODO: вынести в GenericController[TCreateDTO, TResponseDTO] (CRUD/auth роутер на дженериках)
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 

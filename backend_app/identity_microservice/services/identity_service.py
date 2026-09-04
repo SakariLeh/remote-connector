@@ -8,8 +8,9 @@ from backend_app.identity_microservice.DTO import (
     UserResponseDTO,
 )
 from backend_app.identity_microservice.entities import UserEntity
-from backend_app.identity_microservice.middlewares import create_access_token
 from backend_app.identity_microservice.repositories import UserRepository
+
+from backend_app.shared.jwt_authentication import create_access_token
 
 
 class IdentityService:
