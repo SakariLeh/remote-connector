@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend_app.identity_microservice.DTO import UserRequestDTO, UserResponseDTO
 from backend_app.identity_microservice.db_context import get_db
-from backend_app.identity_microservice.middlewares import get_current_user
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.services import UserService
 
@@ -11,7 +10,6 @@ from backend_app.identity_microservice.services import UserService
 profile_router = APIRouter(
     prefix="/profile",
     tags=["Profile"],
-    dependencies=[Depends(get_current_user)],
 )
 
 

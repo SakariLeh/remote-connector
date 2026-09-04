@@ -7,6 +7,7 @@ from backend_app.identity_microservice.controllers import auth_router, profile_r
 from backend_app.identity_microservice.db_context import engine
 from backend_app.identity_microservice.entities import Base
 from backend_app.shared.exception_handling import setup_exception_handling
+from backend_app.shared.jwt_authentication import setup_jwt_authentication
 
 
 # TODO: вынести в generic create_app() фабрику микросервиса (роутеры, lifespan, metadata)
@@ -33,6 +34,16 @@ app = FastAPI(
 
 
 setup_exception_handling(app)
+setup_jwt_authentication(
+    app,
+    public_paths=(
+        "/auth/register",
+        "/auth/authorize",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+    ),
+)
 app.include_router(auth_router)
 app.include_router(profile_router)
 # TODO: подключать роутеры generic-способом (автосбор / registry)
