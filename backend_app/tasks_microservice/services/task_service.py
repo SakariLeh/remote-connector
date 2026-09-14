@@ -11,6 +11,9 @@ class TaskService:
         self.task_repo = task_repository
 
     async def create_task(self, dto: TaskCreateDTO, publisher_id: int) -> TaskResponseDTO:
+        if not await self.task_repo.user_exists(publisher_id):
+            raise ValueError("Publisher user not found")
+
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         task = TaskEntity(
             publisher_id=publisher_id,
@@ -47,6 +50,8 @@ class TaskService:
         if dto.status is not None:
             existing.status = dto.status
         if dto.actor_id is not None:
+            if not await self.task_repo.user_exists(dto.actor_id):
+                raise ValueError("Actor user not found")
             existing.actor_id = dto.actor_id
 
         existing.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)

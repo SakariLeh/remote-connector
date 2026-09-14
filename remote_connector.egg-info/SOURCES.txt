@@ -26,6 +26,9 @@ backend_app/identity_microservice/services/user_service.py
 backend_app/shared/__init__.py
 backend_app/shared/db_context/__init__.py
 backend_app/shared/db_context/database.py
+backend_app/shared/db_context/fk_validation.py
+backend_app/shared/db_context/migrate.py
+backend_app/shared/db_context/models.py
 backend_app/shared/decorators/__init__.py
 backend_app/shared/decorators/controller_action_dec.py
 backend_app/shared/exception_handling/__init__.py

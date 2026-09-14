@@ -1,19 +1,20 @@
 from contextlib import asynccontextmanager
+import asyncio
 
 import uvicorn
 from fastapi import FastAPI
 
+from backend_app.shared.db_context import engine, import_all_models, run_migrations
 from backend_app.shared.exception_handling import setup_exception_handling
 from backend_app.shared.jwt_authentication import setup_jwt_authentication
 from backend_app.tasks_microservice.controllers import tasks_router
-from backend_app.tasks_microservice.db_context import engine
-from backend_app.tasks_microservice.entities import Base
+
+import_all_models()
 
 
 @asynccontextmanager
 async def _lifespan(_app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await asyncio.to_thread(run_migrations)
     yield
     await engine.dispose()
 

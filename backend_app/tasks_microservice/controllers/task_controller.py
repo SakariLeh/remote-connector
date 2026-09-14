@@ -30,7 +30,10 @@ async def create_task(
     current_user: CurrentUser = Depends(get_current_user),
     service: TaskService = Depends(_get_task_service),
 ) -> TaskResponseDTO:
-    return await service.create_task(dto, current_user.user_id)
+    try:
+        return await service.create_task(dto, current_user.user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
 @require_auth
