@@ -24,6 +24,10 @@ class TaskRepository:
         result = await self.db.execute(select(TaskEntity))
         return [TaskResponseDTO.model_validate(task) for task in result.scalars().all()]
 
+    async def get_unassigned_tasks(self) -> Sequence[TaskResponseDTO]:
+        result = await self.db.execute(select(TaskEntity).where(TaskEntity.actor_id.is_(None)))
+        return [TaskResponseDTO.model_validate(task) for task in result.scalars().all()]
+
     async def create_task(self, task: TaskEntity) -> TaskResponseDTO:
         self.db.add(task)
         await self.db.commit()

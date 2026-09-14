@@ -35,6 +35,20 @@ async def create_task(
 
 @require_auth
 @tasks_router.get(
+    "/unassigned",
+    response_model=list[TaskResponseDTO],
+    status_code=status.HTTP_200_OK,
+    summary="Get unassigned tasks",
+    response_description="List of tasks without an executor",
+)
+async def get_unassigned_tasks(
+    service: TaskService = Depends(_get_task_service),
+) -> list[TaskResponseDTO]:
+    return await service.get_unassigned_tasks()
+
+
+@require_auth
+@tasks_router.get(
     "/{task_id}",
     response_model=TaskResponseDTO,
     status_code=status.HTTP_200_OK,

@@ -30,6 +30,9 @@ class TaskService:
     async def get_all_tasks(self) -> list[TaskResponseDTO]:
         return list(await self.task_repo.get_all_tasks())
 
+    async def get_unassigned_tasks(self) -> list[TaskResponseDTO]:
+        return list(await self.task_repo.get_unassigned_tasks())
+
     async def update_task(self, dto: TaskRequestDTO) -> TaskResponseDTO:
         existing = await self.task_repo.get_task_entity_by_id(dto.id)
         if not existing:
