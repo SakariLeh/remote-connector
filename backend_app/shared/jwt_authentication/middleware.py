@@ -44,13 +44,21 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
         router = getattr(request.app, "router", None)
         if router is None:
             return None
-        for route in router.routes:
+        return self._match_endpoint(router.routes, request)
+
+    def _match_endpoint(self, routes: Iterable, request: Request):
+        for route in routes:
             path_regex = getattr(route, "path_regex", None)
             methods = getattr(route, "methods", None)
             if path_regex is not None and path_regex.match(request.url.path) and (
                 methods is None or request.method in methods
             ):
                 return getattr(route, "endpoint", None)
+            nested_router = getattr(route, "original_router", None)
+            if nested_router is not None:
+                matched = self._match_endpoint(nested_router.routes, request)
+                if matched is not None:
+                    return matched
         return None
 
     def _is_public(self, request: Request, endpoint) -> bool:

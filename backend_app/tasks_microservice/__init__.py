@@ -1,3 +1,3 @@
-"""Application microservice package."""
+"""Tasks microservice — публичный API через подпакеты."""
 
 __all__: list[str] = []

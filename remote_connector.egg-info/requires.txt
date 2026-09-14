@@ -5,3 +5,4 @@ aiosqlite
 argon2-cffi
 email-validator
 pydantic
+PyJWT

@@ -1,15 +1,19 @@
 import datetime
 
-from backend_app.tasks_microservice.types.task_status_types import TaskStatusTypes
+from pydantic import BaseModel, ConfigDict
+
+from backend_app.tasks_microservice.types import TaskStatusTypes
 
 
-class TaskResponseDTO:
+class TaskResponseDTO(BaseModel):
     id: int
-    publisherId: int
-    actorId: int | None
+    publisher_id: int
+    actor_id: int | None
     title: str
     description: str
     status: TaskStatusTypes
     price: int
-    createdAt: datetime.datetime
-    updatedAt: datetime.datetime
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+
+    model_config = ConfigDict(from_attributes=True)

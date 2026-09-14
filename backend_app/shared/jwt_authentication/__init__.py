@@ -1,4 +1,4 @@
-from .decorators import RoleChecker, allow_anonymous, require_roles
+from .decorators import RoleChecker, allow_anonymous, require_auth, require_roles
 from .dependencies import get_current_user
 from .middleware import JWTAuthenticationMiddleware
 from .models import CurrentUser
@@ -13,6 +13,7 @@ __all__ = [
     "create_access_token",
     "decode_access_token",
     "get_current_user",
+    "require_auth",
     "require_roles",
     "setup_jwt_authentication",
 ]

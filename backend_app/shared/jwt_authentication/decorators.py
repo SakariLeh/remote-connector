@@ -5,7 +5,13 @@ from fastapi import Depends
 
 from backend_app.shared.jwt_authentication.dependencies import get_current_user
 from backend_app.shared.jwt_authentication.models import CurrentUser
+
 Endpoint = TypeVar("Endpoint", bound=Callable[..., Any])
+
+
+def require_auth(endpoint: Endpoint) -> Endpoint:
+    setattr(endpoint, "requires_auth", True)
+    return endpoint
 
 
 def require_roles(*roles: str) -> Callable[[Endpoint], Endpoint]:
@@ -13,6 +19,7 @@ def require_roles(*roles: str) -> Callable[[Endpoint], Endpoint]:
         raise ValueError("At least one non-empty role is required")
 
     def decorator(endpoint: Endpoint) -> Endpoint:
+        setattr(endpoint, "requires_auth", True)
         setattr(endpoint, "required_roles", frozenset(roles))
         return endpoint
 
