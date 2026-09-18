@@ -19,8 +19,7 @@ class TaskRepository:
         return result.first() is not None
 
     async def get_task_by_id(self, task_id: int) -> TaskResponseDTO | None:
-        result = await self.db.execute(select(TaskEntity).where(TaskEntity.id == task_id))
-        task = result.scalar_one_or_none()
+        task = await self.get_task_entity_by_id(task_id)
         return TaskResponseDTO.model_validate(task) if task else None
 
     async def get_task_entity_by_id(self, task_id: int) -> TaskEntity | None:
@@ -35,6 +34,12 @@ class TaskRepository:
         result = await self.db.execute(select(TaskEntity).where(TaskEntity.actor_id.is_(None)))
         return [TaskResponseDTO.model_validate(task) for task in result.scalars().all()]
 
+    async def get_tasks_by_publisher_id(self, publisher_id: int) -> Sequence[TaskResponseDTO]:
+        result = await self.db.execute(
+            select(TaskEntity).where(TaskEntity.publisher_id == publisher_id)
+        )
+        return [TaskResponseDTO.model_validate(task) for task in result.scalars().all()]
+
     async def create_task(self, task: TaskEntity) -> TaskResponseDTO:
         self.db.add(task)
         await self.db.commit()
@@ -47,7 +52,7 @@ class TaskRepository:
         return TaskResponseDTO.model_validate(task)
 
     async def delete_task(self, task_id: int) -> bool:
-        task = await self.get_task_entity_by_id(task_id)
+        task = await self.get_task_by_id(task_id)
         if not task:
             return False
         await self.db.delete(task)

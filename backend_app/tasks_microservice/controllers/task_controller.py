@@ -1,11 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend_app.shared.jwt_authentication import CurrentUser, get_current_user, require_auth
-from backend_app.tasks_microservice.DTO import TaskCreateDTO, TaskRequestDTO, TaskResponseDTO
+from backend_app.tasks_microservice.DTO import (
+    TaskAssignmentResponseDTO,
+    TaskCreateDTO,
+    TaskPublisherViewDTO,
+    TaskRequestDTO,
+    TaskResponseDTO,
+    TaskSelectActorDTO,
+)
 from backend_app.tasks_microservice.db_context import get_db
-from backend_app.tasks_microservice.repositories import TaskRepository
-from backend_app.tasks_microservice.services import TaskService
+from backend_app.tasks_microservice.repositories import (
+    TaskAssignmentRepository,
+    TaskRepository,
+)
+from backend_app.tasks_microservice.services import TaskAssignmentService, TaskService
 
 tasks_router = APIRouter(
     prefix="/tasks",
@@ -15,6 +25,15 @@ tasks_router = APIRouter(
 
 async def _get_task_service(session: AsyncSession = Depends(get_db)) -> TaskService:
     return TaskService(TaskRepository(session))
+
+
+async def _get_task_assignment_service(
+    session: AsyncSession = Depends(get_db),
+) -> TaskAssignmentService:
+    return TaskAssignmentService(
+        TaskAssignmentRepository(session),
+        TaskRepository(session),
+    )
 
 
 @require_auth
@@ -48,6 +67,108 @@ async def get_unassigned_tasks(
     service: TaskService = Depends(_get_task_service),
 ) -> list[TaskResponseDTO]:
     return await service.get_unassigned_tasks()
+
+
+@require_auth
+@tasks_router.get(
+    "/me/assignments",
+    response_model=list[TaskAssignmentResponseDTO],
+    status_code=status.HTTP_200_OK,
+    summary="Get my task assignments",
+    response_description="Assignments where current user is the actor",
+)
+async def get_my_assignments(
+    actor_status: int | None = Query(default=None),
+    task_id: int | None = Query(default=None),
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskAssignmentService = Depends(_get_task_assignment_service),
+) -> list[TaskAssignmentResponseDTO]:
+    return await service.get_my_assignments(
+        current_user.user_id,
+        actor_status=actor_status,
+        task_id=task_id,
+    )
+
+
+@require_auth
+@tasks_router.get(
+    "/me/published",
+    response_model=TaskPublisherViewDTO,
+    status_code=status.HTTP_200_OK,
+    summary="Get my published tasks with assignments",
+    response_description="Tasks published by current user and their assignments",
+)
+async def get_my_published(
+    actor_status: int | None = Query(default=None),
+    task_id: int | None = Query(default=None),
+    actor_id: int | None = Query(default=None),
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskAssignmentService = Depends(_get_task_assignment_service),
+) -> TaskPublisherViewDTO:
+    return await service.get_publisher_view(
+        current_user.user_id,
+        actor_status=actor_status,
+        task_id=task_id,
+        actor_id=actor_id,
+    )
+
+
+@require_auth
+@tasks_router.post(
+    "/{task_id}/subscribe",
+    response_model=TaskAssignmentResponseDTO,
+    status_code=status.HTTP_201_CREATED,
+    summary="Subscribe to task",
+    response_description="Created task assignment",
+)
+async def subscribe_to_task(
+    task_id: int,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskAssignmentService = Depends(_get_task_assignment_service),
+) -> TaskAssignmentResponseDTO:
+    try:
+        return await service.subscribe(task_id, current_user.user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+
+@require_auth
+@tasks_router.post(
+    "/{task_id}/decline",
+    response_model=TaskAssignmentResponseDTO,
+    status_code=status.HTTP_200_OK,
+    summary="Decline task assignment",
+    response_description="Updated task assignment",
+)
+async def decline_task(
+    task_id: int,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskAssignmentService = Depends(_get_task_assignment_service),
+) -> TaskAssignmentResponseDTO:
+    try:
+        return await service.decline(task_id, current_user.user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+
+@require_auth
+@tasks_router.post(
+    "/{task_id}/select-actor",
+    response_model=TaskAssignmentResponseDTO,
+    status_code=status.HTTP_200_OK,
+    summary="Select actor for task",
+    response_description="Selected actor assignment",
+)
+async def select_actor(
+    task_id: int,
+    dto: TaskSelectActorDTO,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskAssignmentService = Depends(_get_task_assignment_service),
+) -> TaskAssignmentResponseDTO:
+    try:
+        return await service.select_actor(task_id, current_user.user_id, dto.actor_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
 @require_auth
