@@ -1,0 +1,12 @@
+{
+  "/auth/register": {
+    "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/auth/authorize": {
+    "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

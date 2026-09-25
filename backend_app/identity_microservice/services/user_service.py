@@ -1,8 +1,12 @@
 from argon2 import PasswordHasher
+from pydantic import SecretStr
 
-from backend_app.identity_microservice.DTO import UserRequestDTO, UserResponseDTO
+from backend_app.identity_microservice.DTO import (
+    UserCredentialsDTO,
+    UserRequestDTO,
+    UserResponseDTO,
+)
 from backend_app.identity_microservice.repositories import UserRepository
-
 from backend_app.shared.jwt_authentication import CurrentUser, get_current_user
 
 
@@ -18,28 +22,31 @@ class UserService:
         return await self.user_repo.get_user_by_email(email)
 
     async def get_all_users(self) -> list[UserResponseDTO]:
-        return list (await self.user_repo.get_all_users())
+        return list(await self.user_repo.get_all_users())
 
     async def update_user(self, user: UserRequestDTO) -> UserResponseDTO:
-        existing_user = await self.user_repo.get_user_entity_by_id(user.id)
+        existing_user = await self.user_repo.get_user_by_id(user.id)
         if not existing_user:
             raise ValueError("User not found")
 
-        if user.email is not None:
-            existing_user.email = user.email
+        hashed_password: SecretStr | None = None
         if user.password is not None:
-            existing_user.hashed_password = self.ph.hash(user.password)
-        if user.role is not None:
-            existing_user.role = user.role
+            hashed_password = SecretStr(self.ph.hash(user.password))
 
-        updated = await self.user_repo.update_user(existing_user)
+        updated = await self.user_repo.update_user(
+            UserCredentialsDTO(
+                id=user.id,
+                email=user.email,
+                role=user.role,
+                hashed_password=hashed_password,
+            )
+        )
         if not updated:
             raise ValueError("User not found")
         return updated
 
     async def delete_user(self, user_id: int) -> bool:
         return await self.user_repo.delete_user(user_id)
-
 
     async def get_current_user(self) -> UserResponseDTO:
         try:

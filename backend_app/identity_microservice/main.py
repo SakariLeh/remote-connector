@@ -3,6 +3,7 @@ import asyncio
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend_app.identity_microservice.controllers import auth_router, profile_router
 from backend_app.shared.db_context import engine, import_all_models, run_migrations
@@ -41,6 +42,17 @@ setup_jwt_authentication(
         "/openapi.json",
         "/redoc",
     ),
+)
+# After JWT so CORS is outermost and answers OPTIONS.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 app.include_router(auth_router)
 app.include_router(profile_router)
