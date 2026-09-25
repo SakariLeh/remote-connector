@@ -1,7 +1,7 @@
 <header class="topbar">
   <a routerLink="/" class="brand">Freelance Platform</a>
   <nav class="nav">
-    @if (auth.user(); as user) {
+    @if (authService.user(); as user) {
       <span class="user">{{ user.email }}</span>
       <button type="button" class="linkish" (click)="logout()">Logout</button>
     } @else {

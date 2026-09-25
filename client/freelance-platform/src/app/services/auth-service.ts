@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, catchError, switchMap, tap, throwError } from 'rxjs';
 
 const STORAGE_KEY = 'fp_auth';
@@ -24,6 +25,7 @@ interface StoredSession {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly browser = isPlatformBrowser(this.platformId);
 
@@ -61,6 +63,7 @@ export class AuthService {
     if (this.browser) {
       localStorage.removeItem(STORAGE_KEY);
     }
+    void this.router.navigate(['/auth']);
   }
 
   private persist(res: JwtResponse): void {

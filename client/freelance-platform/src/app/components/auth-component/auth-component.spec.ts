@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
@@ -15,6 +16,7 @@ describe('AuthComponent', () => {
       imports: [AuthComponent],
       providers: [
         provideHttpClient(),
+        provideRouter([]),
         {
           provide: AuthService,
           useValue: {

@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 
 @Component({
@@ -11,6 +12,7 @@ import { AuthService } from '../../services/auth-service';
 })
 export class AuthComponent {
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   protected readonly mode = signal<'login' | 'register'>('login');
@@ -44,7 +46,10 @@ export class AuthComponent {
         : this.authService.register(email, password);
 
     request.subscribe({
-      next: () => this.pending.set(false),
+      next: () => {
+        this.pending.set(false);
+        void this.router.navigate(['/profile']);
+      },
       error: (message: string) => {
         this.error.set(message);
         this.pending.set(false);

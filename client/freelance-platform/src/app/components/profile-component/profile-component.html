@@ -1,0 +1,16 @@
+@if (user(); as currentUser) {
+    <div class="profile-card">
+        <div class="avatar">{{ currentUser.email.charAt(0).toUpperCase() }}</div>
+        <div class="user-info">
+            <h3>Профиль пользователя</h3>
+            <p class="user-id">ID: {{currentUser.id}}</p>
+        </div>
+
+        <div class="profile-body">
+            <div class="info-group">
+                <label>Email адреса:</label>
+                <span>{{ currentUser.email }}</span>
+            </div>
+        </div>
+    </div>
+}

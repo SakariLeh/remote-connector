@@ -1,0 +1,40 @@
+.profile-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.user-info h3,
+.user-id,
+.info-group {
+  margin: 0;
+}
+
+.user-id {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.info-group {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.info-group label {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
