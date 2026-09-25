@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../auth';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-auth-component',
@@ -10,13 +10,13 @@ import { AuthService } from '../../auth';
   styleUrl: './auth-component.css',
 })
 export class AuthComponent {
-  private readonly auth = inject(AuthService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly mode = signal<'login' | 'register'>('login');
   protected readonly error = signal<string | null>(null);
   protected readonly pending = signal(false);
-  protected readonly user = this.auth.user;
+  protected readonly user = this.authService.user;
 
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -40,8 +40,8 @@ export class AuthComponent {
 
     const request =
       this.mode() === 'login'
-        ? this.auth.login(email, password)
-        : this.auth.register(email, password);
+        ? this.authService.login(email, password)
+        : this.authService.register(email, password);
 
     request.subscribe({
       next: () => this.pending.set(false),
@@ -53,6 +53,6 @@ export class AuthComponent {
   }
 
   logout(): void {
-    this.auth.logout();
+    this.authService.logout();
   }
 }
