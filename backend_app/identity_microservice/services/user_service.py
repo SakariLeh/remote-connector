@@ -2,6 +2,7 @@ from argon2 import PasswordHasher
 from pydantic import SecretStr
 
 from backend_app.identity_microservice.DTO import (
+    UpdateProfileDTO,
     UserCredentialsDTO,
     UserRequestDTO,
     UserResponseDTO,
@@ -45,12 +46,33 @@ class UserService:
             raise ValueError("User not found")
         return updated
 
+    async def update_current_user(
+        self,
+        user_id: int,
+        dto: UpdateProfileDTO,
+    ) -> UserResponseDTO:
+        updated = await self.user_repo.update_user(
+            UserCredentialsDTO(
+                id=user_id,
+                email=dto.email,
+                role=None,
+                hashed_password=(
+                    SecretStr(self.ph.hash(dto.password))
+                    if dto.password is not None
+                    else None
+                ),
+            )
+        )
+        if not updated:
+            raise ValueError("User not found")
+        return updated
+
     async def delete_user(self, user_id: int) -> bool:
         return await self.user_repo.delete_user(user_id)
 
     async def get_current_user(self) -> UserResponseDTO:
         try:
-            user: CurrentUser = await get_current_user()
-            return UserResponseDTO(id=8, email="user2@example.com", role="admin")
+            current_user: CurrentUser = await get_current_user()
+            return await self.user_repo.get_user_by_id(current_user.user_id)
         except ValueError as error:
             raise ValueError("Failed to get current user") from error
