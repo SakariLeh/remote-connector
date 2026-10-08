@@ -3,6 +3,7 @@
   <nav class="nav">
     @if (authService.user(); as user) {
       <span class="user">{{ user.email }}</span>
+      <a routerLink="/profile">Profile</a>
       <button type="button" class="linkish" (click)="logout()">Logout</button>
     } @else {
       <a routerLink="/auth">Login</a>

@@ -57,6 +57,16 @@ export class AuthService {
     );
   }
 
+  updateProfile(
+    id: number,
+    email: string,
+    password: string | null,
+  ): Observable<AuthUser> {
+    return this.http
+      .post<AuthUser>('/profile/update', { id, email, password })
+      .pipe(catchError((err) => throwError(() => this.toMessage(err))));
+  }
+
   logout(): void {
     this.token.set(null);
     this.user.set(null);

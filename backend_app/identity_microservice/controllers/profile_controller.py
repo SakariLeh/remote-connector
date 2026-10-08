@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.identity_microservice.DTO import UserRequestDTO, UserResponseDTO
+from backend_app.identity_microservice.DTO import (
+    UpdateProfileDTO,
+    UserRequestDTO,
+    UserResponseDTO,
+)
 from backend_app.identity_microservice.db_context import get_db
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.services import UserService
+from backend_app.shared.jwt_authentication import CurrentUser, get_current_user
 
 
 profile_router = APIRouter(
@@ -38,15 +43,16 @@ async def get_user(
     "/update",
     response_model=UserResponseDTO,
     status_code=status.HTTP_200_OK,
-    summary="Update user profile",
+    summary="Update current user profile",
     response_description="Updated user profile",
 )
-async def update_user(
-    dto: UserRequestDTO,
+async def update_current_user(
+    dto: UpdateProfileDTO,
+    current_user: CurrentUser = Depends(get_current_user),
     service: UserService = Depends(_get_user_service),
 ) -> UserResponseDTO:
     try:
-        return await service.update_user(dto)
+        return await service.update_current_user(current_user.user_id, dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
