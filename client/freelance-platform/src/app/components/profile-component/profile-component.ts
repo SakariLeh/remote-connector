@@ -1,6 +1,6 @@
 import { Component, inject, signal, type Signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService, type AuthUser } from '../../auth';
+import { AuthService, type AuthUser } from '../../services/auth-service';
 
 @Component({
   selector: 'app-profile-component',
@@ -10,10 +10,10 @@ import { AuthService, type AuthUser } from '../../auth';
   styleUrl: './profile-component.css',
 })
 export class ProfileComponent {
-  private readonly auth = inject(AuthService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
-  protected readonly user: Signal<AuthUser | null> = this.auth.user;
+  protected readonly user: Signal<AuthUser | null> = this.authService.user;
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.minLength(6)]],
@@ -24,7 +24,7 @@ export class ProfileComponent {
   protected readonly success = signal<string | null>(null);
 
   constructor() {
-    this.form.controls.email.setValue(this.auth.user()?.email ?? '');
+    this.form.controls.email.setValue(this.authService.user()?.email ?? '');
   }
 
   protected updateProfile(): void {
@@ -48,9 +48,9 @@ export class ProfileComponent {
     this.error.set(null);
     this.success.set(null);
 
-    this.auth.updateProfile(currentUser.id, email, password || null).subscribe({
+    this.authService.updateProfile(currentUser.id, email, password || null).subscribe({
       next: (updatedUser) => {
-        this.auth.user.set(updatedUser);
+        this.authService.user.set(updatedUser);
         this.form.patchValue({ password: '', confirmPassword: '' });
         this.success.set('Profile updated successfully');
         this.pending.set(false);

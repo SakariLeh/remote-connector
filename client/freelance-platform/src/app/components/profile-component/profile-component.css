@@ -33,10 +33,14 @@ h1 {
   font-size: 1.75rem;
 }
 
-.profile-heading p:last-child,
+.profile-heading p:not(.eyebrow),
 .empty-state p {
   margin: 0.4rem 0 0;
   color: #6b7280;
+}
+
+.user-id {
+  font-size: 0.9rem;
 }
 
 .avatar {

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { AuthService } from './auth';
+import { AuthService } from './services/auth-service';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +9,9 @@ import { AuthService } from './auth';
   styleUrl: './app.css',
 })
 export class App {
-  protected readonly auth = inject(AuthService);
+  protected readonly authService = inject(AuthService);
 
   logout(): void {
-    this.auth.logout();
+    this.authService.logout();
   }
 }
