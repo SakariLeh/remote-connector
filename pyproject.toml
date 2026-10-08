@@ -11,6 +11,7 @@ dependencies = [
   "uvicorn",
   "sqlalchemy",
   "aiosqlite",
+  "alembic",
   "argon2-cffi",
   "email-validator",
   "pydantic",

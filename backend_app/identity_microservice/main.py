@@ -1,22 +1,21 @@
 from contextlib import asynccontextmanager
+import asyncio
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend_app.identity_microservice.controllers import auth_router, profile_router
-from backend_app.identity_microservice.db_context import engine
-from backend_app.identity_microservice.entities import Base
+from backend_app.shared.db_context import engine, import_all_models, run_migrations
+from backend_app.shared.exception_handling import setup_exception_handling
+from backend_app.shared.jwt_authentication import setup_jwt_authentication
 
-__all__ = ["app"]
-
-
-# TODO: вынести в generic create_app() фабрику микросервиса (роутеры, lifespan, metadata)
+import_all_models()
 
 
 @asynccontextmanager
 async def _lifespan(_app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await asyncio.to_thread(run_migrations)
     yield
     await engine.dispose()
 
@@ -32,9 +31,31 @@ app = FastAPI(
     swagger_ui_parameters={"persistAuthorization": True},
 )
 
+
+setup_exception_handling(app)
+setup_jwt_authentication(
+    app,
+    public_paths=(
+        "/auth/register",
+        "/auth/authorize",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+    ),
+)
+# After JWT so CORS is outermost and answers OPTIONS.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(auth_router)
 app.include_router(profile_router)
-# TODO: подключать роутеры generic-способом (автосбор / registry)
 
 
 if __name__ == "__main__":

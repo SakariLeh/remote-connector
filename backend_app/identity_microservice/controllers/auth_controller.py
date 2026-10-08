@@ -10,8 +10,9 @@ from backend_app.identity_microservice.DTO import (
 from backend_app.identity_microservice.db_context import get_db
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.services import IdentityService
+from backend_app.shared.jwt_authentication import CurrentUser, allow_anonymous, get_current_user, require_roles
 
-__all__ = ["auth_router"]
+
 
 # TODO: вынести в GenericController[TCreateDTO, TResponseDTO] (CRUD/auth роутер на дженериках)
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -21,7 +22,7 @@ auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 async def _get_identity_service(session: AsyncSession = Depends(get_db)) -> IdentityService:
     return IdentityService(UserRepository(session))
 
-
+@allow_anonymous
 @auth_router.post(
     "/register",
     response_model=UserResponseDTO,
@@ -38,7 +39,7 @@ async def register(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
-
+@allow_anonymous
 @auth_router.post(
     "/authorize",
     response_model=JwtResponseDTO,
@@ -51,3 +52,12 @@ async def authorize(auth_dto: UserAuthDTO, service: IdentityService = Depends(_g
         return await service.authorize_user(auth_dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+@require_roles("user", "admin")
+@auth_router.get("/me", response_model=UserResponseDTO, status_code=status.HTTP_200_OK, summary="Get current user profile", response_description="Current user profile")
+async def get_current_user_profile(current_user: CurrentUser = Depends(get_current_user)) -> UserResponseDTO:
+    return UserResponseDTO(
+        id=current_user.user_id,
+        email=current_user.email,
+        role=current_user.role,
+    )

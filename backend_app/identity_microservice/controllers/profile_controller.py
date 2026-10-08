@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.identity_microservice.DTO import UserRequestDTO, UserResponseDTO
+from backend_app.identity_microservice.DTO import (
+    UpdateProfileDTO,
+    UserRequestDTO,
+    UserResponseDTO,
+)
 from backend_app.identity_microservice.db_context import get_db
-from backend_app.identity_microservice.middlewares import get_current_user
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.identity_microservice.services import UserService
+from backend_app.shared.jwt_authentication import CurrentUser, get_current_user
 
-__all__ = ["profile_router"]
 
 profile_router = APIRouter(
     prefix="/profile",
     tags=["Profile"],
-    dependencies=[Depends(get_current_user)],
 )
 
 
@@ -41,15 +43,16 @@ async def get_user(
     "/update",
     response_model=UserResponseDTO,
     status_code=status.HTTP_200_OK,
-    summary="Update user profile",
+    summary="Update current user profile",
     response_description="Updated user profile",
 )
-async def update_user(
-    dto: UserRequestDTO,
+async def update_current_user(
+    dto: UpdateProfileDTO,
+    current_user: CurrentUser = Depends(get_current_user),
     service: UserService = Depends(_get_user_service),
 ) -> UserResponseDTO:
     try:
-        return await service.update_user(dto)
+        return await service.update_current_user(current_user.user_id, dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
@@ -78,3 +81,15 @@ async def get_users(
     service: UserService = Depends(_get_user_service),
 ) -> list[UserResponseDTO]:
     return await service.get_all_users()
+
+
+@profile_router.get("/me", response_model=UserResponseDTO, status_code=status.HTTP_200_OK, summary="Get current user profile", response_description="Current user profile")
+async def get_current_user(service: UserService = Depends(_get_user_service)) -> UserResponseDTO:
+    try:
+        return await service.get_current_user()
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
