@@ -1,21 +1,28 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.identity_microservice.DTO.Request.user_create_dto import UserCreateDTO
-from backend_app.identity_microservice.DTO.Response.user_response_dto import UserResponseDTO
-from backend_app.identity_microservice.db_context.database import get_db
-from backend_app.identity_microservice.repositories.user_repository import UserRepository
-from backend_app.identity_microservice.services.identity_service import IdentityService
+from backend_app.identity_microservice.DTO import (
+    JwtResponseDTO,
+    UserAuthDTO,
+    UserCreateDTO,
+    UserResponseDTO,
+)
+from backend_app.identity_microservice.db_context import get_db
+from backend_app.identity_microservice.repositories import UserRepository
+from backend_app.identity_microservice.services import IdentityService
+from backend_app.shared.jwt_authentication import CurrentUser, allow_anonymous, get_current_user, require_roles
+
+
 
 # TODO: вынести в GenericController[TCreateDTO, TResponseDTO] (CRUD/auth роутер на дженериках)
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 # TODO: заменить на generic get_service[TService] / DI-контейнер
-async def get_identity_service(session: AsyncSession = Depends(get_db)) -> IdentityService:
+async def _get_identity_service(session: AsyncSession = Depends(get_db)) -> IdentityService:
     return IdentityService(UserRepository(session))
 
-
+@allow_anonymous
 @auth_router.post(
     "/register",
     response_model=UserResponseDTO,
@@ -25,9 +32,32 @@ async def get_identity_service(session: AsyncSession = Depends(get_db)) -> Ident
 )
 async def register(
     dto: UserCreateDTO,
-    service: IdentityService = Depends(get_identity_service),
+    service: IdentityService = Depends(_get_identity_service),
 ) -> UserResponseDTO:
     try:
         return await service.register_new_user(dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+@allow_anonymous
+@auth_router.post(
+    "/authorize",
+    response_model=JwtResponseDTO,
+    status_code=status.HTTP_200_OK,
+    summary="Authorize a user",
+    response_description="JWT token",
+)
+async def authorize(auth_dto: UserAuthDTO, service: IdentityService = Depends(_get_identity_service)) -> JwtResponseDTO:
+    try:
+        return await service.authorize_user(auth_dto)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+@require_roles("user", "admin")
+@auth_router.get("/me", response_model=UserResponseDTO, status_code=status.HTTP_200_OK, summary="Get current user profile", response_description="Current user profile")
+async def get_current_user_profile(current_user: CurrentUser = Depends(get_current_user)) -> UserResponseDTO:
+    return UserResponseDTO(
+        id=current_user.user_id,
+        email=current_user.email,
+        role=current_user.role,
+    )

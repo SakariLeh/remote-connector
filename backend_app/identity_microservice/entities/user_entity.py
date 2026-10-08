@@ -1,10 +1,7 @@
 from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
-
-# TODO: вынести Base в generic db_context (общий DeclarativeBase для всех entity)
-class Base(DeclarativeBase):
-    pass
+from backend_app.shared.db_context import Base
 
 
 class UserEntity(Base):

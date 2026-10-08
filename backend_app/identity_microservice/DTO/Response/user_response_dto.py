@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 
+
 class UserResponseDTO(BaseModel):
     id: int
     email: EmailStr

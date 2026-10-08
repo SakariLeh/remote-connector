@@ -1,32 +1,61 @@
 from contextlib import asynccontextmanager
+import asyncio
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from backend_app.identity_microservice.controllers.auth_controller import auth_router
-from backend_app.identity_microservice.db_context.database import engine
-from backend_app.identity_microservice.entities.user_entity import Base
+from backend_app.identity_microservice.controllers import auth_router, profile_router
+from backend_app.shared.db_context import engine, import_all_models, run_migrations
+from backend_app.shared.exception_handling import setup_exception_handling
+from backend_app.shared.jwt_authentication import setup_jwt_authentication
 
-# TODO: вынести в generic create_app() фабрику микросервиса (роутеры, lifespan, metadata)
+import_all_models()
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+async def _lifespan(_app: FastAPI):
+    await asyncio.to_thread(run_migrations)
     yield
     await engine.dispose()
 
 
 app = FastAPI(
     title="Identity Microservice",
-    description="Authentication and identity management API",
+    description=(
+        "Authentication and identity management API. "
+        "Protected routes: Authorize in Swagger with JWT from POST /auth/authorize."
+    ),
     version="0.1.0",
-    lifespan=lifespan,
+    lifespan=_lifespan,
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
+
+setup_exception_handling(app)
+setup_jwt_authentication(
+    app,
+    public_paths=(
+        "/auth/register",
+        "/auth/authorize",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+    ),
+)
+# After JWT so CORS is outermost and answers OPTIONS.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(auth_router)
-# TODO: подключать роутеры generic-способом (автосбор / registry)
+app.include_router(profile_router)
 
 
 if __name__ == "__main__":
