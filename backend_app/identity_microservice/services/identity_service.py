@@ -35,14 +35,20 @@ class IdentityService:
         return created_user
 
     async def change_password(self, id: int, dto: ChangePasswordDTO) -> JwtResponseDTO:
+        print("----------------------------------------------------")
         user = await self.user_repo.get_user_credentials_by_id(id)
         if not user:
-            raise ValueError("User not found")
-        if not self.ph.verify(user.hashed_password.get_secret_value(), dto.old_password):
-            raise ValueError("Invalid old password")
-        hashed_pass = self.ph.hash(dto.new_password)
-        await self.user_repo.update_user_credentials(id, UserCredentialsDTO(email=user.email, hashed_password=SecretStr(hashed_pass), role=user.role))
-        jwt_token = create_access_token(id, user.email, user.role)
+            print("[Service] 1 step: Not a user")
+            raise ValueError("User not found") 
+        if not self.ph.verify(user.hashed_password.get_secret_value(), dto.old_password):     
+            print("[Service] 2 step: Invalid old password")
+            raise ValueError("Invalid old password")   
+        hashed_pass = self.ph.hash(dto.new_password)  
+        print("[Service] 3 step: Hashed new password")
+        await self.user_repo.update_user(UserCredentialsDTO(id=id, email=user.email, hashed_password=SecretStr(hashed_pass), role=user.role))  
+        print("[Service] 4 step: Updated credentials")
+        jwt_token = create_access_token(id, user.email, user.role)    
+        print("[Service] 5 step: Created JWT token")
         return JwtResponseDTO(id=id, email=user.email, jwt_token=jwt_token)
 
     async def authorize_user(self, auth_dto: UserAuthDTO) -> JwtResponseDTO:

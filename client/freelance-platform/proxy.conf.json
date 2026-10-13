@@ -8,5 +8,15 @@
     "target": "http://127.0.0.1:8001",
     "secure": false,
     "changeOrigin": true
+  },
+  "/auth/change-password": {
+    "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/auth/update-profile": {
+    "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
   }
 }

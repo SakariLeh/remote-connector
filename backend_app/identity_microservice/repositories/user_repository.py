@@ -56,11 +56,13 @@ class UserRepository:
 
     async def update_user(self, dto: UserCredentialsDTO) -> UserResponseDTO | None:
         if dto.id is None:
+            print("[Repository] 1 step: No id")
             raise ValueError("id is required to update a user")
 
         user = await self._get_entity_by_id(dto.id)
         if not user:
-            return None
+            print("[Repository] 2 step: No user")
+            raise ValueError("User not found")
 
         if dto.email is not None:
             user.email = dto.email
@@ -69,8 +71,11 @@ class UserRepository:
         if dto.hashed_password is not None:
             user.hashed_password = dto.hashed_password.get_secret_value()
 
+        print("[Repository] 3 step: Updated user")
         await self.db.commit()
+        print("[Repository] 4 step: Committed user")
         await self.db.refresh(user)
+        print("[Repository] 5 step: Refreshed user")
         return UserResponseDTO.model_validate(user)
 
     async def delete_user(self, user_id: int) -> bool:
