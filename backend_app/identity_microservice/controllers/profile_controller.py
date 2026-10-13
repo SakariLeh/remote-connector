@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend_app.identity_microservice.DTO import (
+    ChangePasswordDTO,
     UpdateProfileDTO,
     UserRequestDTO,
     UserResponseDTO,
@@ -53,6 +54,22 @@ async def update_current_user(
 ) -> UserResponseDTO:
     try:
         return await service.update_current_user(current_user.user_id, dto)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+
+@profile_router.post(
+    "/change-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Change current user password",
+)
+async def change_current_user_password(
+    dto: ChangePasswordDTO,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: UserService = Depends(_get_user_service),
+) -> None:
+    try:
+        await service.change_password(current_user.user_id, dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 

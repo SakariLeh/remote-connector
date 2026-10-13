@@ -58,11 +58,19 @@ export class AuthService {
   }
 
   updateProfile(
-    id: number,
     email: string,
-    password: string | null,
   ): Observable<AuthUser> {
     return this.http
+      .post<AuthUser>('/profile/update', { email })
+      .pipe(catchError((err) => throwError(() => this.toMessage(err))));
+  }
+
+  changePassword(oldPassword: string, newPassword: string): Observable<void> {
+    return this.http
+      .post<void>('/profile/change-password', {
+        old_password: oldPassword,
+        new_password: newPassword,
+      })
       .post<AuthUser>('/profile/update-password', { id, email, password })
       .pipe(catchError((err) => throwError(() => this.toMessage(err))));
   }
