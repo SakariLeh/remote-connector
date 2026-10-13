@@ -32,6 +32,10 @@ class UserRepository:
         user = await self._get_entity_by_email(email)
         return UserCredentialsDTO.model_validate(user) if user else None
 
+    async def get_user_credentials_by_id(self, user_id: int) -> UserCredentialsDTO | None:
+        user = await self._get_entity_by_id(user_id)
+        return UserCredentialsDTO.model_validate(user) if user else None
+
     async def get_all_users(self) -> Sequence[UserResponseDTO]:
         result = await self.db.execute(select(UserEntity))
         return [UserResponseDTO.model_validate(user) for user in result.scalars().all()]

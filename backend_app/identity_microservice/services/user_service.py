@@ -1,7 +1,9 @@
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from pydantic import SecretStr
 
 from backend_app.identity_microservice.DTO import (
+    ChangePasswordDTO,
     UpdateProfileDTO,
     UserCredentialsDTO,
     UserRequestDTO,
@@ -56,16 +58,28 @@ class UserService:
                 id=user_id,
                 email=dto.email,
                 role=None,
-                hashed_password=(
-                    SecretStr(self.ph.hash(dto.password))
-                    if dto.password is not None
-                    else None
-                ),
             )
         )
         if not updated:
             raise ValueError("User not found")
         return updated
+
+    async def change_password(self, user_id: int, dto: ChangePasswordDTO) -> None:
+        user = await self.user_repo.get_user_credentials_by_id(user_id)
+        if not user or not user.hashed_password:
+            raise ValueError("User not found")
+
+        try:
+            self.ph.verify(user.hashed_password.get_secret_value(), dto.old_password)
+        except VerifyMismatchError:
+            raise ValueError("Old password is incorrect") from None
+
+        await self.user_repo.update_user(
+            UserCredentialsDTO(
+                id=user_id,
+                hashed_password=SecretStr(self.ph.hash(dto.new_password)),
+            )
+        )
 
     async def delete_user(self, user_id: int) -> bool:
         return await self.user_repo.delete_user(user_id)

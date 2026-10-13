@@ -14,33 +14,55 @@ export class ProfileComponent {
   private readonly fb = inject(FormBuilder);
 
   protected readonly user: Signal<AuthUser | null> = this.authService.user;
-  protected readonly form = this.fb.nonNullable.group({
+  protected readonly profileForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.minLength(6)]],
-    confirmPassword: ['', [Validators.minLength(6)]],
+  });
+  protected readonly passwordForm = this.fb.nonNullable.group({
+    oldPassword: ['', [Validators.required]],
+    newPassword: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
   });
   protected readonly pending = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly success = signal<string | null>(null);
 
   constructor() {
-    this.form.controls.email.setValue(this.authService.user()?.email ?? '');
+    this.profileForm.controls.email.setValue(this.authService.user()?.email ?? '');
   }
 
   protected updateProfile(): void {
-    if (this.form.invalid || this.pending()) {
-      this.form.markAllAsTouched();
+    if (this.profileForm.invalid || this.pending()) {
+      this.profileForm.markAllAsTouched();
       return;
     }
 
-    const { email, password, confirmPassword } = this.form.getRawValue();
-    if (password && password !== confirmPassword) {
+    const { email } = this.profileForm.getRawValue();
+    this.pending.set(true);
+    this.error.set(null);
+    this.success.set(null);
+
+    this.authService.updateProfile(email).subscribe({
+      next: (updatedUser) => {
+        this.authService.user.set(updatedUser);
+        this.success.set('Profile updated successfully');
+        this.pending.set(false);
+      },
+      error: (message: string) => {
+        this.error.set(message);
+        this.pending.set(false);
+      },
+    });
+  }
+
+  protected changePassword(): void {
+    if (this.passwordForm.invalid || this.pending()) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+
+    const { oldPassword, newPassword, confirmPassword } = this.passwordForm.getRawValue();
+    if (newPassword !== confirmPassword) {
       this.error.set('Passwords do not match');
-      return;
-    }
-
-    const currentUser = this.user();
-    if (!currentUser) {
       return;
     }
 
@@ -48,11 +70,10 @@ export class ProfileComponent {
     this.error.set(null);
     this.success.set(null);
 
-    this.authService.updateProfile(currentUser.id, email, password || null).subscribe({
-      next: (updatedUser) => {
-        this.authService.user.set(updatedUser);
-        this.form.patchValue({ password: '', confirmPassword: '' });
-        this.success.set('Profile updated successfully');
+    this.authService.changePassword(oldPassword, newPassword).subscribe({
+      next: () => {
+        this.passwordForm.reset();
+        this.success.set('Password changed successfully');
         this.pending.set(false);
       },
       error: (message: string) => {
