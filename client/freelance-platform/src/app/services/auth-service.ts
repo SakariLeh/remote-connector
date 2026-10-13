@@ -71,6 +71,7 @@ export class AuthService {
         old_password: oldPassword,
         new_password: newPassword,
       })
+      .post<AuthUser>('/profile/update-password', { id, email, password })
       .pipe(catchError((err) => throwError(() => this.toMessage(err))));
   }
 

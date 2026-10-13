@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend_app.identity_microservice.DTO import (
+    ChangePasswordDTO,
     JwtResponseDTO,
     UserAuthDTO,
     UserCreateDTO,
@@ -50,6 +51,20 @@ async def register(
 async def authorize(auth_dto: UserAuthDTO, service: IdentityService = Depends(_get_identity_service)) -> JwtResponseDTO:
     try:
         return await service.authorize_user(auth_dto)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+@require_roles("user", "admin")
+@auth_router.post(
+    "/change-password",
+    response_model=JwtResponseDTO,
+    status_code=status.HTTP_200_OK,
+    summary="Change user password",
+    response_description="JWT token",
+)
+async def change_password(dto: ChangePasswordDTO, current_user: CurrentUser = Depends(get_current_user), service: IdentityService = Depends(_get_identity_service)) -> JwtResponseDTO:
+    try:
+        return await service.change_password(current_user.user_id, dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 

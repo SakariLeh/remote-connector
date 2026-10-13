@@ -9,6 +9,7 @@ from backend_app.identity_microservice.DTO import (
     UserCredentialsDTO,
     UserResponseDTO,
 )
+from backend_app.identity_microservice.DTO.Request import ChangePasswordDTO
 from backend_app.identity_microservice.repositories import UserRepository
 from backend_app.shared.jwt_authentication import create_access_token
 
@@ -32,6 +33,17 @@ class IdentityService:
             )
         )
         return created_user
+
+    async def change_password(self, id: int, dto: ChangePasswordDTO) -> JwtResponseDTO:
+        user = await self.user_repo.get_user_credentials_by_id(id)
+        if not user:
+            raise ValueError("User not found")
+        if not self.ph.verify(user.hashed_password.get_secret_value(), dto.old_password):
+            raise ValueError("Invalid old password")
+        hashed_pass = self.ph.hash(dto.new_password)
+        await self.user_repo.update_user_credentials(id, UserCredentialsDTO(email=user.email, hashed_password=SecretStr(hashed_pass), role=user.role))
+        jwt_token = create_access_token(id, user.email, user.role)
+        return JwtResponseDTO(id=id, email=user.email, jwt_token=jwt_token)
 
     async def authorize_user(self, auth_dto: UserAuthDTO) -> JwtResponseDTO:
         """Authorize a user and return a JWT wrapped in JwtResponseDTO."""
