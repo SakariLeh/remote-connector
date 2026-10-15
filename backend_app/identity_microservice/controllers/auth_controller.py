@@ -64,6 +64,7 @@ async def authorize(auth_dto: UserAuthDTO, service: IdentityService = Depends(_g
 )
 async def change_password(dto: ChangePasswordDTO, current_user: CurrentUser = Depends(get_current_user), service: IdentityService = Depends(_get_identity_service)) -> JwtResponseDTO:
     try:
+        print("[auth_controller] 1. change_password: giving to service.change_password", flush=True)
         return await service.change_password(current_user.user_id, dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e

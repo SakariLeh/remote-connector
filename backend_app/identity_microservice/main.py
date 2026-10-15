@@ -2,13 +2,14 @@ from contextlib import asynccontextmanager
 import asyncio
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend_app.identity_microservice.controllers import auth_router, profile_router
 from backend_app.shared.db_context import engine, import_all_models, run_migrations
 from backend_app.shared.exception_handling import setup_exception_handling
 from backend_app.shared.jwt_authentication import setup_jwt_authentication
+from backend_app.shared.logging import RequestLoggingMiddleware
 
 import_all_models()
 
@@ -54,6 +55,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+#app.add_middleware(RequestLoggingMiddleware)
+
 app.include_router(auth_router)
 app.include_router(profile_router)
 
@@ -64,4 +68,6 @@ if __name__ == "__main__":
         host="127.0.0.1",
         port=8001,
         reload=True,
+        log_level="debug",
+        access_log=True
     )

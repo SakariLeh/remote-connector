@@ -35,7 +35,7 @@ class IdentityService:
         return created_user
 
     async def change_password(self, id: int, dto: ChangePasswordDTO) -> JwtResponseDTO:
-        print("----------------------------------------------------")
+        print("----------------------------------------------------", flush=True)
         user = await self.user_repo.get_user_credentials_by_id(id)
         if not user:
             print("[Service] 1 step: Not a user")
