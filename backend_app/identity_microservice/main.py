@@ -9,9 +9,10 @@ from backend_app.identity_microservice.controllers import auth_router, profile_r
 from backend_app.shared.db_context import engine, import_all_models, run_migrations
 from backend_app.shared.exception_handling import setup_exception_handling
 from backend_app.shared.jwt_authentication import setup_jwt_authentication
-from backend_app.shared.logging import RequestLoggingMiddleware
+from backend_app.shared.logging import RequestLoggingMiddleware, setup_logging
 
 import_all_models()
+setup_logging("identity_microservice")
 
 
 @asynccontextmanager
@@ -56,7 +57,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(
+    RequestLoggingMiddleware,
+    service_name="identity_microservice",
+)
 
 app.include_router(auth_router)
 app.include_router(profile_router)

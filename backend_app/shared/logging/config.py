@@ -9,6 +9,13 @@ def setup_logging(service_name: str, level: str = "INFO") -> None:
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
+        structlog.processors.CallsiteParameterAdder(
+            parameters={
+                structlog.processors.CallsiteParameter.MODULE,
+                structlog.processors.CallsiteParameter.FUNC_NAME,
+                structlog.processors.CallsiteParameter.LINENO,
+            }
+        ),
         structlog.processors.TimeStamper(fmt="iso", utc=True), # ISO - это временная метка в базовой структуре YYYY-MM-DD T hh:mm:ssZ
 
         structlog.processors.StackInfoRenderer(),

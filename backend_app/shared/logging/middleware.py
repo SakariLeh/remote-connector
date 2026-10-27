@@ -7,11 +7,18 @@ from starlette.requests import Request
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, service_name: str | None = None):
+        super().__init__(app)
+        self.service_name = service_name
+
     async def dispatch(self, request: Request, call_next):
         request_id = request.headers.get("X-Request-ID") or str(uuid4())
 
         structlog.contextvars.clear_contextvars()
-        structlog.contextvars.bind_contextvars(request_id=request_id)
+        context = {"request_id": request_id}
+        if self.service_name is not None:
+            context["service_name"] = self.service_name
+        structlog.contextvars.bind_contextvars(**context)
 
         logger = structlog.get_logger("http")
         started = time.perf_counter()

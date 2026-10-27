@@ -7,9 +7,11 @@ from fastapi import FastAPI
 from backend_app.shared.db_context import engine, import_all_models, run_migrations
 from backend_app.shared.exception_handling import setup_exception_handling
 from backend_app.shared.jwt_authentication import setup_jwt_authentication
+from backend_app.shared.logging import RequestLoggingMiddleware, setup_logging
 from backend_app.tasks_microservice.controllers import tasks_router
 
 import_all_models()
+setup_logging("tasks_microservice")
 
 
 @asynccontextmanager
@@ -39,6 +41,10 @@ setup_jwt_authentication(
         "/openapi.json",
         "/redoc",
     ),
+)
+app.add_middleware(
+    RequestLoggingMiddleware,
+    service_name="tasks_microservice",
 )
 app.include_router(tasks_router)
 

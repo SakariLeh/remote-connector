@@ -16,6 +16,7 @@ dependencies = [
   "email-validator",
   "pydantic",
   "PyJWT",
+  "structlog",
 ]
 
 [tool.setuptools.packages.find]
