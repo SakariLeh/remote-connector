@@ -40,9 +40,11 @@ class IdentityService:
         if not user:
             print("[Service] 1 step: Not a user")
             raise ValueError("User not found") 
-        if not self.ph.verify(user.hashed_password.get_secret_value(), dto.old_password):     
+        try:
+            self.ph.verify(user.hashed_password.get_secret_value(), dto.old_password)
+        except VerifyMismatchError:
             print("[Service] 2 step: Invalid old password")
-            raise ValueError("Invalid old password")   
+            raise ValueError("Invalid old password") from None   
         hashed_pass = self.ph.hash(dto.new_password)  
         print("[Service] 3 step: Hashed new password")
         await self.user_repo.update_user(UserCredentialsDTO(id=id, email=user.email, hashed_password=SecretStr(hashed_pass), role=user.role))  

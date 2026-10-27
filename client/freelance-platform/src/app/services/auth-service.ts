@@ -66,7 +66,10 @@ export class AuthService {
   }
 
   changePassword(oldPassword: string, newPassword: string): Observable<void> {
-    return this.http.post<void>('/auth/change-password', { oldPassword, newPassword })
+    return this.http.post<void>('/auth/change-password', {
+      old_password: oldPassword,
+      new_password: newPassword,
+    })
     .pipe(catchError((err) => throwError(() => this.toMessage(err))));
   }
 

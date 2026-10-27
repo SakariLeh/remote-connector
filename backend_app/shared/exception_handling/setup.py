@@ -7,13 +7,14 @@ from backend_app.shared.exception_handling.middleware import (
     app_exception_handler,
     http_exception_handler,
     unhandled_exception_handler,
+    validation_exception_handler,
 )
 
 
 def setup_exception_handling(app: FastAPI) -> FastAPI:
     app.add_exception_handler(AppException, app_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    app.add_exception_handler(RequestValidationError, http_exception_handler)
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)
 
     return app

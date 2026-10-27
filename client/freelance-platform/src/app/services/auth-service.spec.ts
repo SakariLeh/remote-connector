@@ -28,7 +28,7 @@ describe('AuthService', () => {
   it('sends the change-password payload expected by the API', () => {
     service.changePassword('old-secret', 'new-secret').subscribe();
 
-    const request = httpTesting.expectOne('/profile/change-password');
+    const request = httpTesting.expectOne('/auth/change-password');
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({
       old_password: 'old-secret',

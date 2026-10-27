@@ -1,4 +1,5 @@
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
@@ -38,8 +39,17 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     return _error_response(status_code=exc.status_code, code=code, message=message, details=details)
 
 
-async def starlette_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    return _error_response(status_code=exc.status_code, code="HTTP_ERROR", message=str(exc))
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    details = [
+        {"loc": err["loc"], "msg": err["msg"], "type": err["type"]}
+        for err in exc.errors()
+    ]
+    return _error_response(
+        status_code=422,
+        code="UNPROCESSABLE_ENTITY",
+        message="Request validation failed",
+        details=details,
+    )
 
 
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
