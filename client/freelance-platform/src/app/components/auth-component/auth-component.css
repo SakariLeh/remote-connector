@@ -1,10 +1,13 @@
 .card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  max-width: 28rem;
+  margin: 0 auto;
+  background: #10233c;
+  border: 1px solid #263d5b;
   border-radius: 0.75rem;
   padding: 1.5rem;
   display: grid;
   gap: 1rem;
+  color: #e8eef8;
 }
 
 h1 {
@@ -20,16 +23,17 @@ h1 {
 
 .tabs button {
   flex: 1;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
+  border: 1px solid #355274;
+  color: #c4d2e5;
+  background: #142a46;
   border-radius: 0.5rem;
   padding: 0.5rem;
   cursor: pointer;
 }
 
 .tabs button.active {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: #2861a8;
+  border-color: #2861a8;
   color: #fff;
 }
 
@@ -46,8 +50,10 @@ label {
 
 input {
   padding: 0.55rem 0.65rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #355274;
   border-radius: 0.45rem;
+  background: #0c1c30;
+  color: #eef4ff;
   font: inherit;
 }
 
@@ -55,7 +61,7 @@ button[type='submit'],
 .card > button {
   border: 0;
   border-radius: 0.5rem;
-  background: #2563eb;
+  background: #2861a8;
   color: #fff;
   padding: 0.65rem 0.85rem;
   font: inherit;
@@ -69,6 +75,6 @@ button[type='submit']:disabled {
 
 .error {
   margin: 0;
-  color: #b91c1c;
+  color: #ff9a9a;
   font-size: 0.9rem;
 }

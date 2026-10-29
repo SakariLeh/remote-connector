@@ -3,11 +3,14 @@
 }
 
 .profile-card {
+  max-width: 48rem;
+  margin: 0 auto;
   padding: 2rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #263d5b;
   border-radius: 1rem;
-  background: #ffffff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  background: #10233c;
+  color: #e8eef8;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
 }
 
 .profile-heading {
@@ -20,7 +23,7 @@
 
 .eyebrow {
   margin: 0 0 0.35rem;
-  color: #2563eb;
+  color: #91b9f4;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -29,14 +32,14 @@
 
 h1 {
   margin: 0;
-  color: #111827;
+  color: #f1f5fc;
   font-size: 1.75rem;
 }
 
 .profile-heading p:not(.eyebrow),
 .empty-state p {
   margin: 0.4rem 0 0;
-  color: #6b7280;
+  color: #aebed4;
 }
 
 .user-id {
@@ -49,8 +52,8 @@ h1 {
   height: 3rem;
   place-items: center;
   border-radius: 50%;
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #203d64;
+  color: #b7d3fa;
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -63,7 +66,7 @@ form {
 .field {
   display: grid;
   gap: 0.45rem;
-  color: #374151;
+  color: #c4d2e5;
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -72,10 +75,10 @@ input {
   width: 100%;
   box-sizing: border-box;
   padding: 0.75rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #355274;
   border-radius: 0.55rem;
-  background: #fff;
-  color: #111827;
+  background: #0c1c30;
+  color: #eef4ff;
   font: inherit;
   font-weight: 400;
   outline: none;
@@ -83,8 +86,8 @@ input {
 }
 
 input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  border-color: #6ea5f2;
+  box-shadow: 0 0 0 3px rgb(110 165 242 / 18%);
 }
 
 input.ng-invalid {
@@ -92,7 +95,7 @@ input.ng-invalid {
 }
 
 .field-error {
-  color: #b91c1c;
+  color: #ff9a9a;
   font-size: 0.8rem;
   font-weight: 400;
 }
@@ -102,7 +105,7 @@ button {
   padding: 0.75rem 1.15rem;
   border: 0;
   border-radius: 0.55rem;
-  background: #2563eb;
+  background: #2861a8;
   color: #fff;
   font: inherit;
   font-weight: 600;
@@ -110,7 +113,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: #3975c1;
 }
 
 button:disabled {
@@ -126,13 +129,13 @@ button:disabled {
 }
 
 .error {
-  background: #fef2f2;
-  color: #991b1b;
+  background: #4a2530;
+  color: #ffd1d5;
 }
 
 .success {
-  background: #f0fdf4;
-  color: #166534;
+  background: #163d38;
+  color: #b8f1db;
 }
 
 .empty-state {

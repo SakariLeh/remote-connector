@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  color: var(--dashboard-text);
+  background: var(--dashboard-page);
+}
+
+.dashboard-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: calc(100dvh - var(--dashboard-header-height));
+}
+
+.dashboard-sidebar-slot {
+  display: none;
+}
+
+.dashboard-main {
+  min-width: 0;
+  padding: 2rem clamp(1rem, 3vw, 2.5rem);
+}
+
+.dashboard-main p {
+  margin: 0;
+  color: var(--dashboard-muted);
+}
+
+.dashboard-error {
+  margin: 1rem 2rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--dashboard-danger-border);
+  border-radius: var(--dashboard-radius-sm);
+  color: var(--dashboard-danger-text);
+  background: var(--dashboard-danger-bg);
+}

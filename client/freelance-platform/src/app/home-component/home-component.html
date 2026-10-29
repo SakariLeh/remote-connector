@@ -1,0 +1,44 @@
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Биржа услуг для ваших задач</p>
+    <h1>Найдите специалиста<br />для любой работы</h1>
+    <p class="hero-description">
+      Выберите направление, опишите задачу и найдите исполнителя для своего проекта.
+    </p>
+    <a class="primary-button" routerLink="/auth">Начать работу <span aria-hidden="true">→</span></a>
+    <p class="hero-note">Публикуйте заказы или выбирайте готовые услуги</p>
+  </div>
+</section>
+
+<section class="categories-section" aria-labelledby="categories-title">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Выберите направление</p>
+      <h2 id="categories-title">Популярные категории</h2>
+    </div>
+    <p class="section-description">От повседневных задач до больших проектов — найдите нужного специалиста.</p>
+  </div>
+
+  <div class="category-grid">
+    @for (category of categories; track category.name) {
+      <article class="category-card">
+        <div class="category-icon" aria-hidden="true">{{ category.icon }}</div>
+        <h3>{{ category.name }}</h3>
+        <p class="category-description">{{ category.description }}</p>
+        <ul class="subcategories" aria-label="Подкатегории">
+          @for (subcategory of category.subcategories; track subcategory.slug) {
+            <li><a [routerLink]="['/works', subcategory.slug]">{{ subcategory.name }} <span aria-hidden="true">→</span></a></li>
+          }
+        </ul>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div>
+    <h2>Есть задача? Начните здесь.</h2>
+    <p>Создайте аккаунт, чтобы разместить заказ или откликнуться на работу.</p>
+  </div>
+  <a class="secondary-button" routerLink="/auth">Перейти к регистрации <span aria-hidden="true">→</span></a>
+</section>

@@ -1,16 +1,18 @@
-<header class="topbar">
-  <a routerLink="/" class="brand">Freelance Platform</a>
-  <nav class="nav">
-    @if (authService.user(); as user) {
-      <span class="user">{{ user.email }}</span>
-      <a routerLink="/profile">Profile</a>
-      <button type="button" class="linkish" (click)="logout()">Logout</button>
-    } @else {
-      <a routerLink="/auth">Login</a>
-    }
-  </nav>
-</header>
+@if (!isDashboard()) {
+  <header class="topbar">
+    <a routerLink="/" class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Биржа услуг</a>
+    <nav class="nav">
+      @if (authService.user(); as user) {
+        <span class="user">{{ user.email }}</span>
+        <a routerLink="/profile">Профиль</a>
+        <button type="button" class="linkish" (click)="logout()">Выйти</button>
+      } @else {
+        <a routerLink="/auth">Войти</a>
+      }
+    </nav>
+  </header>
+}
 
-<main class="page">
+<main class="page" [class.dashboard-page]="isDashboard()">
   <router-outlet />
 </main>
