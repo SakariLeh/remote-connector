@@ -1,10 +1,11 @@
 import { Component, inject, signal, viewChild } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { HeaderComponent } from './header/header';
 import { DASHBOARD_TEXT } from './dashboard-text';
-import { DashboardStateService } from './dashboard-state.service';
-import { MessagesService } from './services/messages.service';
-import { NotificationsService } from './services/notifications.service';
-import { UserService } from './services/user.service';
+import { DashboardStateService } from '../../services/dashboard-state-service';
+import { MessagesService } from '../../services/messages-service';
+import { NotificationsService } from '../../services/notifications-service';
+import { UserService } from '../../services/user-service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -38,9 +39,9 @@ export class UserDashboardComponent {
   async ngOnInit(): Promise<void> {
     try {
       const [user, notifications, conversations] = await Promise.all([
-        this.users.getCurrentUser(),
-        this.notificationsService.getNotifications(),
-        this.messagesService.getConversations(),
+        firstValueFrom(this.users.getCurrentUser()),
+        firstValueFrom(this.notificationsService.getNotifications()),
+        firstValueFrom(this.messagesService.getConversations()),
       ]);
       this.state.user.set(user);
       this.dashboardHeader().setData(notifications, conversations);

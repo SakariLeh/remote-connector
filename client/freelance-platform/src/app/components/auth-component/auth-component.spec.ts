@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
-import { AuthService } from '../../auth';
+import { AuthService } from '../../services/auth-service';
 import { AuthComponent } from './auth-component';
 
 describe('AuthComponent', () => {

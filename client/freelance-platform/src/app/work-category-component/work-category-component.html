@@ -1,42 +1,26 @@
-@if (subcategory(); as selected) {
-  <a class="back-link" routerLink="/">← Все направления</a>
+<a class="back-link" routerLink="/">← Все направления</a>
 
+@if (loading()) {
   <section class="topic-heading">
-    <p class="eyebrow">{{ selected.category.name }}</p>
-    <h1>Работы: {{ selected.name }}</h1>
-    <p>Заказы и услуги по направлению «{{ selected.name }}».</p>
+    <p class="eyebrow">Категория</p>
+    <h1>Загрузка…</h1>
   </section>
-
-  <section class="work-section" aria-labelledby="work-title">
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">Направление</p>
-        <h2 id="work-title">Примеры работ</h2>
-      </div>
-      <span class="topic-badge">{{ selected.name }}</span>
-    </div>
-
-    <div class="work-grid">
-      @for (example of selected.examples; track example) {
-        <article class="work-card">
-          <span class="work-icon" aria-hidden="true">✦</span>
-          <div>
-            <h3>{{ example }}</h3>
-            <p>Пример услуги в категории «{{ selected.name }}»</p>
-          </div>
-        </article>
-      }
-    </div>
-
-    <p class="notice">
-      Это примеры услуг, а не опубликованные объявления. Фильтрация реальных заказов по категориям
-      появится после добавления категорий в данные заказов.
-    </p>
-  </section>
-} @else {
+} @else if (notFound()) {
   <section class="not-found">
     <p class="eyebrow">Страница не найдена</p>
     <h1>Такой категории нет</h1>
     <a class="back-link" routerLink="/">Вернуться к направлениям</a>
+  </section>
+} @else if (error()) {
+  <section class="not-found">
+    <p class="eyebrow">Ошибка</p>
+    <h1>{{ error() }}</h1>
+    <a class="back-link" routerLink="/">Вернуться к направлениям</a>
+  </section>
+} @else if (category(); as selected) {
+  <section class="topic-heading">
+    <p class="eyebrow">Категория</p>
+    <h1>{{ selected.name }}</h1>
+    <p>{{ selected.description }}</p>
   </section>
 }

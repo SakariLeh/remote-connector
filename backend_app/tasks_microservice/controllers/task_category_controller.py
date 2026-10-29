@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.shared.jwt_authentication import require_auth
+from backend_app.shared.jwt_authentication import allow_anonymous, require_auth
 from backend_app.tasks_microservice.DTO import (
     TaskCategoryCreateDTO,
     TaskCategoryRequestDTO,
@@ -38,7 +38,7 @@ async def create_task_category(
     return await service.create_category(dto)
 
 
-@require_auth
+@allow_anonymous
 @task_categories_router.get(
     "/",
     response_model=list[TaskCategoryResponseDTO],
@@ -52,7 +52,7 @@ async def get_task_categories(
     return await service.get_all_categories()
 
 
-@require_auth
+@allow_anonymous
 @task_categories_router.get(
     "/{category_id}",
     response_model=TaskCategoryResponseDTO,

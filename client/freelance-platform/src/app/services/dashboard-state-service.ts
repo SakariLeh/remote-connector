@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import type { User, UserRole } from './types';
+import type { User, UserRole } from '../components/dashboard/types';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardStateService {

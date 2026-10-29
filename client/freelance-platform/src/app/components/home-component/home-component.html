@@ -19,20 +19,25 @@
     <p class="section-description">От повседневных задач до больших проектов — найдите нужного специалиста.</p>
   </div>
 
-  <div class="category-grid">
-    @for (category of categories; track category.name) {
-      <article class="category-card">
-        <div class="category-icon" aria-hidden="true">{{ category.icon }}</div>
-        <h3>{{ category.name }}</h3>
-        <p class="category-description">{{ category.description }}</p>
-        <ul class="subcategories" aria-label="Подкатегории">
-          @for (subcategory of category.subcategories; track subcategory.slug) {
-            <li><a [routerLink]="['/works', subcategory.slug]">{{ subcategory.name }} <span aria-hidden="true">→</span></a></li>
-          }
-        </ul>
-      </article>
-    }
-  </div>
+  @if (loading()) {
+    <p class="categories-status">Загрузка категорий…</p>
+  } @else if (error()) {
+    <p class="categories-status categories-error" role="alert">{{ error() }}</p>
+  } @else if (categories().length === 0) {
+    <p class="categories-status">Категории пока не добавлены.</p>
+  } @else {
+    <div class="category-grid">
+      @for (category of categories(); track category.id) {
+        <article class="category-card">
+          <h3>{{ category.name }}</h3>
+          <p class="category-description">{{ category.description }}</p>
+          <a class="category-link" [routerLink]="['/works', category.id]">
+            Смотреть <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      }
+    </div>
+  }
 </section>
 
 <section class="bottom-cta">

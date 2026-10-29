@@ -29,19 +29,23 @@ import { DASHBOARD_TEXT } from '../dashboard-text';
       </button>
       <app-dashboard-dropdown [open]="open()" panelId="messages-panel">
         <h2 class="dropdown-heading">{{ text.messages.label }}</h2>
-        <ul class="conversation-list">
-          @for (conversation of conversations(); track conversation.id) {
-            <li>
-              <strong>{{ conversation.peerName }}</strong>
-              <span>{{ conversation.lastMessage }}</span>
-              <time>{{ conversation.updatedAt }}</time>
-              @if (conversation.unreadCount > 0) {
-                <span class="conversation-unread">{{ conversation.unreadCount }}</span>
-              }
-            </li>
-          }
-        </ul>
-        <a class="dropdown-link" routerLink="/dashboard" (click)="toggle()()">{{ text.messages.all }}</a>
+        @if (conversations().length) {
+          <ul class="conversation-list">
+            @for (conversation of conversations(); track conversation.id) {
+              <li>
+                <strong>{{ conversation.peerName }}</strong>
+                <span>{{ conversation.lastMessage }}</span>
+                <time>{{ conversation.updatedAt }}</time>
+                @if (conversation.unreadCount > 0) {
+                  <span class="conversation-unread">{{ conversation.unreadCount }}</span>
+                }
+              </li>
+            }
+          </ul>
+          <a class="dropdown-link" routerLink="/dashboard" (click)="toggle()()">{{ text.messages.all }}</a>
+        } @else {
+          <p class="dropdown-empty">{{ text.messages.empty }}</p>
+        }
       </app-dashboard-dropdown>
     </div>
   `,
