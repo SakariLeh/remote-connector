@@ -1,11 +1,14 @@
 from .Request import (
     TaskAssignmentRequestDTO,
+    TaskCategoryCreateDTO,
+    TaskCategoryRequestDTO,
     TaskCreateDTO,
     TaskRequestDTO,
     TaskSelectActorDTO,
 )
 from .Response import (
     TaskAssignmentResponseDTO,
+    TaskCategoryResponseDTO,
     TaskPublisherViewDTO,
     TaskResponseDTO,
 )
@@ -13,6 +16,9 @@ from .Response import (
 __all__ = [
     "TaskAssignmentRequestDTO",
     "TaskAssignmentResponseDTO",
+    "TaskCategoryCreateDTO",
+    "TaskCategoryRequestDTO",
+    "TaskCategoryResponseDTO",
     "TaskCreateDTO",
     "TaskPublisherViewDTO",
     "TaskRequestDTO",

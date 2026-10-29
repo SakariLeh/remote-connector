@@ -18,6 +18,7 @@ class TaskEntity(Base):
     status: Mapped[TaskStatusTypes] = mapped_column(
         String(50), nullable=False, default=TaskStatusTypes.NEW
     )
+    category_id: Mapped[int] = mapped_column(ForeignKey("task_categories.id"), nullable=False)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)

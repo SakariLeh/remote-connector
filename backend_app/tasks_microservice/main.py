@@ -8,7 +8,7 @@ from backend_app.shared.db_context import engine, import_all_models, run_migrati
 from backend_app.shared.exception_handling import setup_exception_handling
 from backend_app.shared.jwt_authentication import setup_jwt_authentication
 from backend_app.shared.logging import RequestLoggingMiddleware, setup_logging
-from backend_app.tasks_microservice.controllers import tasks_router
+from backend_app.tasks_microservice.controllers import task_categories_router, tasks_router
 
 import_all_models()
 setup_logging("tasks_microservice")
@@ -47,6 +47,7 @@ app.add_middleware(
     service_name="tasks_microservice",
 )
 app.include_router(tasks_router)
+app.include_router(task_categories_router)
 
 
 if __name__ == "__main__":
