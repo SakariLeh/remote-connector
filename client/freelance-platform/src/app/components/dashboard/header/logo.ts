@@ -14,7 +14,6 @@ import { DASHBOARD_TEXT } from '../dashboard-text';
         </svg>
       </span>
       <span class="dashboard-brand-name">{{ text.logo }}</span>
-      <span class="dashboard-pro">{{ text.pro }}</span>
     </a>
   `,
 })

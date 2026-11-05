@@ -23,13 +23,12 @@ import { DASHBOARD_TEXT } from '../dashboard-text';
           (click)="toggle()()"
         >
           <app-dashboard-avatar
-            [src]="currentUser.avatarUrl"
-            [initials]="currentUser.firstName[0] + currentUser.lastNameInitial[0]"
-            [label]="currentUser.firstName + ' ' + currentUser.lastNameInitial"
+            [initials]="emailInitial(currentUser.email)"
+            [label]="currentUser.email"
           />
           <span class="user-menu-copy">
-            <strong>{{ currentUser.firstName }} {{ currentUser.lastNameInitial }}</strong>
-            <span>{{ currentUser.grade }} {{ currentUser.specialization }}</span>
+            <strong>{{ currentUser.email }}</strong>
+            <span>{{ currentUser.role }}</span>
           </span>
         </button>
         <app-dashboard-dropdown [open]="open()" panelId="user-panel">
@@ -37,7 +36,6 @@ import { DASHBOARD_TEXT } from '../dashboard-text';
             <a routerLink="/profile" (click)="toggle()()">{{ text.userMenu.profile }}</a>
             <a routerLink="/profile" (click)="toggle()()">{{ text.userMenu.settings }}</a>
             <a routerLink="/profile" (click)="toggle()()">{{ text.userMenu.wallet }}</a>
-            <a routerLink="/profile" (click)="toggle()()">{{ text.userMenu.pro }}</a>
             <span class="menu-divider"></span>
             <button type="button" (click)="logout()()">{{ text.userMenu.logout }}</button>
           </nav>
@@ -52,4 +50,8 @@ export class UserMenuComponent {
   readonly toggle = input.required<() => void>();
   readonly logout = input.required<() => void>();
   protected readonly text = DASHBOARD_TEXT;
+
+  protected emailInitial(email: string): string {
+    return (email.trim()[0] ?? '?').toUpperCase();
+  }
 }

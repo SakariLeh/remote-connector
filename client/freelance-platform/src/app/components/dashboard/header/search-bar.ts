@@ -1,5 +1,5 @@
 import { Component, ElementRef, HostListener, inject, output, viewChild } from '@angular/core';
-import { DashboardStateService } from '../dashboard-state.service';
+import { DashboardStateService } from '../../../services/dashboard-state-service';
 import { DASHBOARD_TEXT } from '../dashboard-text';
 
 @Component({

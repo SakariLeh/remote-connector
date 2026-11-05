@@ -19,6 +19,7 @@ class TaskService:
             publisher_id=publisher_id,
             actor_id=None,
             title=dto.title,
+            category_id=dto.task_category_id,
             description=dto.description,
             status=TaskStatusTypes.NEW,
             price=dto.price,
@@ -45,6 +46,8 @@ class TaskService:
             existing.title = dto.title
         if dto.description is not None:
             existing.description = dto.description
+        if dto.task_category_id is not None:
+            existing.category_id = dto.task_category_id
         if dto.price is not None:
             existing.price = dto.price
         if dto.status is not None:

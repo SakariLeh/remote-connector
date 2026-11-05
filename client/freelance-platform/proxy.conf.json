@@ -14,8 +14,23 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/auth/me": {
+    "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/auth/update-profile": {
     "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/profile": {
+    "target": "http://127.0.0.1:8001",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/task-categories": {
+    "target": "http://127.0.0.1:8002",
     "secure": false,
     "changeOrigin": true
   }

@@ -9,6 +9,8 @@ class TaskResponseDTO(BaseModel):
     id: int
     publisher_id: int
     actor_id: int | None
+    task_category_id: int
+    task_category_name: str
     title: str
     description: str
     status: TaskStatusTypes

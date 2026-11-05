@@ -2,14 +2,9 @@ export type UserRole = 'executor' | 'customer';
 export type Theme = 'dark' | 'light';
 
 export interface User {
-  id: string;
-  firstName: string;
-  lastNameInitial: string;
-  avatarUrl?: string;
-  specialization: string;
-  grade?: string;
-  isPro: boolean;
-  availableRoles: UserRole[];
+  id: number;
+  email: string;
+  role: string;
 }
 
 export interface NotificationItem {

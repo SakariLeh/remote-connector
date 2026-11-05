@@ -1,7 +1,6 @@
 export const DASHBOARD_TEXT = {
   logo: 'WorkPulse',
   logoLabel: 'WorkPulse — кабинет',
-  pro: 'PRO',
   roleSelection: 'Выбор роли',
   roles: {
     executor: 'Я Исполнитель',
@@ -20,6 +19,7 @@ export const DASHBOARD_TEXT = {
   },
   messages: {
     label: 'Сообщения',
+    empty: 'Сообщений нет',
     all: 'Все сообщения',
   },
   userMenu: {
@@ -27,7 +27,6 @@ export const DASHBOARD_TEXT = {
     profile: 'Мой профиль',
     settings: 'Настройки',
     wallet: 'Кошелёк / Баланс',
-    pro: 'Тариф PRO',
     logout: 'Выйти',
   },
   theme: {

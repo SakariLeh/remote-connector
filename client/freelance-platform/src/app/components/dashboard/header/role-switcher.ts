@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { DashboardStateService } from '../dashboard-state.service';
+import { DashboardStateService } from '../../../services/dashboard-state-service';
 import { DASHBOARD_TEXT } from '../dashboard-text';
 import type { UserRole } from '../types';
 

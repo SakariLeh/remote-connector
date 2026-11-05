@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { DOCUMENT } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
-import type { Theme } from './types';
+import type { Theme } from '../components/dashboard/types';
 
 const THEME_STORAGE_KEY = 'workpulse-theme';
 
