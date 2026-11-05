@@ -3,9 +3,29 @@
     <a routerLink="/" class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Биржа услуг</a>
     <nav class="nav">
       @if (authService.user(); as user) {
-        <span class="user">{{ user.email }}</span>
-        <a routerLink="/profile">Профиль</a>
-        <button type="button" class="linkish" (click)="logout()">Выйти</button>
+        <div class="user-menu">
+          <button
+            type="button"
+            class="user-menu-trigger"
+            [attr.aria-expanded]="userMenuOpen()"
+            aria-haspopup="true"
+            aria-controls="user-menu-panel"
+            (click)="toggleUserMenu()"
+          >
+            <span class="user-avatar" aria-hidden="true">{{ user.email.charAt(0).toUpperCase() }}</span>
+            <span class="user-email">{{ user.email }}</span>
+            <span class="user-menu-chevron" aria-hidden="true">⌄</span>
+          </button>
+          @if (userMenuOpen()) {
+            <div class="user-menu-panel" id="user-menu-panel">
+              <a routerLink="/dashboard" (click)="closeUserMenu()">Мои заказы</a>
+              <a routerLink="/dashboard" (click)="closeUserMenu()">Мои отклики</a>
+              <a routerLink="/profile" (click)="closeUserMenu()">Настройки</a>
+              <span class="user-menu-divider" aria-hidden="true"></span>
+              <button type="button" (click)="logout()">Выход</button>
+            </div>
+          }
+        </div>
       } @else {
         <a routerLink="/auth">Войти</a>
       }

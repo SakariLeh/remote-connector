@@ -14,6 +14,7 @@ import { AuthService } from './services/auth-service';
 export class App {
   protected readonly authService = inject(AuthService);
   protected readonly isDashboard = signal(false);
+  protected readonly userMenuOpen = signal(false);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -24,10 +25,22 @@ export class App {
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((event) => this.isDashboard.set(event.urlAfterRedirects.startsWith('/dashboard')));
+      .subscribe((event) => {
+        this.isDashboard.set(event.urlAfterRedirects.startsWith('/dashboard'));
+        this.closeUserMenu();
+      });
+  }
+
+  protected toggleUserMenu(): void {
+    this.userMenuOpen.update((open) => !open);
+  }
+
+  protected closeUserMenu(): void {
+    this.userMenuOpen.set(false);
   }
 
   logout(): void {
+    this.closeUserMenu();
     this.authService.logout();
   }
 }

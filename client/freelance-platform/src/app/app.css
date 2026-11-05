@@ -54,26 +54,105 @@
   gap: 0.75rem;
 }
 
-.nav a,
-.linkish {
+.nav > a {
   color: #adc8ed;
   text-decoration: none;
-  background: none;
-  border: 0;
-  padding: 0;
-  font: inherit;
   font-size: 0.92rem;
   cursor: pointer;
 }
 
-.nav a:hover,
-.linkish:hover {
+.nav > a:hover {
   color: #fff;
 }
 
-.user {
-  color: #adbed4;
-  font-size: 0.95rem;
+.user-menu {
+  position: relative;
+}
+
+.user-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.65rem 0.25rem 0.3rem;
+  border: 1px solid #29415f;
+  border-radius: 999px;
+  color: #e8eef8;
+  background: #10233b;
+  font: inherit;
+  cursor: pointer;
+}
+
+.user-menu-trigger:hover,
+.user-menu-trigger[aria-expanded='true'] {
+  border-color: #4b76ad;
+  background: #162d49;
+}
+
+.user-avatar {
+  display: grid;
+  width: 1.9rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #2861a8;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.user-email {
+  max-width: 16rem;
+  overflow: hidden;
+  color: #d3e2f6;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-chevron {
+  color: #adc8ed;
+  font-size: 1.1rem;
+}
+
+.user-menu-panel {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  display: grid;
+  min-width: 12rem;
+  padding: 0.4rem;
+  border: 1px solid #29415f;
+  border-radius: 0.75rem;
+  background: #10233b;
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 28%);
+}
+
+.user-menu-panel a,
+.user-menu-panel button {
+  padding: 0.65rem 0.75rem;
+  border: 0;
+  border-radius: 0.45rem;
+  color: #d3e2f6;
+  background: transparent;
+  font: inherit;
+  font-size: 0.92rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.user-menu-panel a:hover,
+.user-menu-panel button:hover {
+  color: #fff;
+  background: #1b385b;
+}
+
+.user-menu-divider {
+  height: 1px;
+  margin: 0.3rem 0.45rem;
+  background: #29415f;
 }
 
 .page {
@@ -99,7 +178,7 @@
     padding: 0 1rem;
   }
 
-  .user {
-    display: none;
+  .user-email {
+    max-width: 9rem;
   }
 }
