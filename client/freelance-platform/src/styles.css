@@ -1,5 +1,11 @@
 :root {
   color-scheme: dark;
+  --font-main: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bg-blur: 8px;
+  --bg-overlay: rgb(5 12 23 / 48%);
+  --cursor-gradient-inner: rgb(62 145 242 / 42%);
+  --cursor-gradient-outer: rgb(51 126 222 / 18%);
+  --cursor-gradient-opacity: 0.9;
   --dashboard-header-height: 4rem;
   --dashboard-page: #0b1220;
   --dashboard-header: #0b1220;
@@ -50,11 +56,12 @@ body {
 }
 
 body {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-main);
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 

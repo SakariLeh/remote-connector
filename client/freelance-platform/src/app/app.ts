@@ -17,12 +17,14 @@ export class App {
   protected readonly authService = inject(AuthService);
   private readonly dashboardState = inject(DashboardStateService);
   protected readonly isDashboard = signal(false);
+  protected readonly isHome = signal(false);
   protected readonly userMenuOpen = signal(false);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     this.isDashboard.set(this.router.url.startsWith('/dashboard'));
+    this.isHome.set(this.isHomeUrl(this.router.url));
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -30,8 +32,13 @@ export class App {
       )
       .subscribe((event) => {
         this.isDashboard.set(event.urlAfterRedirects.startsWith('/dashboard'));
+        this.isHome.set(this.isHomeUrl(event.urlAfterRedirects));
         this.closeUserMenu();
       });
+  }
+
+  private isHomeUrl(url: string): boolean {
+    return url.split(/[?#]/, 1)[0] === '/';
   }
 
   protected toggleUserMenu(): void {

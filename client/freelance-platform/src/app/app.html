@@ -1,3 +1,11 @@
+@if (isHome()) {
+  <div class="landing-background" aria-hidden="true">
+    <div class="landing-background-image"></div>
+    <div class="landing-background-overlay"></div>
+    <div class="landing-cursor-gradient"></div>
+  </div>
+}
+
 @if (!isDashboard()) {
   <header class="topbar">
     <a routerLink="/" class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Биржа услуг</a>

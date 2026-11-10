@@ -12,7 +12,7 @@
   border-radius: 1.5rem;
   padding: clamp(2rem, 6vw, 4.5rem);
   color: #fff;
-  background: radial-gradient(ellipse at 90% 10%, #234f87 0%, transparent 35%), linear-gradient(115deg, #0d1d32, #163d6d);
+  background: linear-gradient(115deg, rgb(13 29 50 / 88%), rgb(22 61 109 / 80%));
 }
 
 .hero-copy {

@@ -1,17 +1,48 @@
 :host {
   display: block;
   min-height: 100dvh;
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    Segoe UI,
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif;
+  font-family: var(--font-main);
   color: #e8eef8;
   background: #091525;
+}
+
+.landing-background {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background: #10233c;
+  pointer-events: none;
+}
+
+.landing-background-image {
+  position: absolute;
+  inset: 0;
+  /* SVG — лёгкая заглушка; замените её на WebP в public/assets/images и обновите URL. */
+  background: url("/assets/images/landing-background.svg") center / cover no-repeat;
+  filter: blur(var(--bg-blur));
+  transform: scale(1.1);
+}
+
+.landing-background-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  /* Вместо тёмной заливки можно использовать backdrop-filter: blur(var(--bg-blur)). */
+}
+
+.landing-cursor-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 38rem at var(--mx, 50vw) var(--my, 50vh),
+    var(--cursor-gradient-inner) 0%,
+    var(--cursor-gradient-outer) 42%,
+    transparent 100%
+  );
+  opacity: var(--cursor-gradient-opacity);
+  mix-blend-mode: screen;
+  will-change: background;
 }
 
 .topbar {
@@ -156,6 +187,8 @@
 }
 
 .page {
+  position: relative;
+  z-index: 1;
   max-width: 76rem;
   margin: 1.5rem auto;
   padding: 0 1.25rem;
