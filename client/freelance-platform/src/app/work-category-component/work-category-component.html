@@ -23,4 +23,60 @@
     <h1>{{ selected.name }}</h1>
     <p>{{ selected.description }}</p>
   </section>
+
+  <section class="work-section">
+    <div class="section-title">
+      <h2>Свободные заказы</h2>
+    </div>
+
+    @if (tasksLoading()) {
+      <p class="notice">Загрузка заказов…</p>
+    } @else if (tasksError()) {
+      <p class="notice" role="alert">{{ tasksError() }}</p>
+    } @else if (tasks().length === 0) {
+      <p class="notice">Свободных заказов пока нет.</p>
+    } @else {
+      <div class="work-grid">
+        @for (task of tasks(); track task.id) {
+          <a class="work-card" [routerLink]="['/tasks', task.id]">
+            <div>
+              <h3>{{ task.title }}</h3>
+              <p>{{ task.price }} ₽ · {{ statusLabel[task.status] }}</p>
+            </div>
+          </a>
+        }
+      </div>
+    }
+
+    @if (auth.user()) {
+      <form [formGroup]="createForm" (ngSubmit)="createTask(selected.id)">
+        <h2>Разместить заказ</h2>
+        <label class="field">
+          <span>Название</span>
+          <input type="text" formControlName="title" maxlength="255" />
+        </label>
+        <label class="field">
+          <span>Описание</span>
+          <textarea formControlName="description" rows="4" maxlength="255"></textarea>
+        </label>
+        <label class="field">
+          <span>Цена, ₽</span>
+          <input type="number" formControlName="price" min="1" />
+        </label>
+        @if (createError()) {
+          <p class="message error" role="alert">{{ createError() }}</p>
+        }
+        @if (createSuccess()) {
+          <p class="message success" role="status">{{ createSuccess() }}</p>
+        }
+        <button type="submit" [disabled]="createPending()">
+          {{ createPending() ? 'Публикация…' : 'Опубликовать' }}
+        </button>
+      </form>
+    } @else {
+      <p class="notice">
+        <a routerLink="/auth">Войти</a>, чтобы откликнуться или опубликовать заказ.
+      </p>
+    }
+  </section>
 }

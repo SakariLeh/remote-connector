@@ -1,0 +1,57 @@
+name: remote-connector
+
+services:
+  migrate:
+    build: &backend
+      context: ..
+      dockerfile: docker/Dockerfile
+    command:
+      [
+        "python",
+        "-c",
+        "from backend_app.shared.db_context.migrate import run_migrations; run_migrations()",
+      ]
+    volumes: &sqlite
+      - sqlite_data:/app/data
+    restart: "no"
+
+  identitymicroservice:
+    build: *backend
+    command:
+      [
+        "uvicorn",
+        "backend_app.identity_microservice.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8001",
+      ]
+    ports:
+      - "8001:8001"
+    volumes: *sqlite
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: always
+
+  tasksmicroservice:
+    build: *backend
+    command:
+      [
+        "uvicorn",
+        "backend_app.tasks_microservice.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8002",
+      ]
+    ports:
+      - "8002:8002"
+    volumes: *sqlite
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: always
+
+volumes:
+  sqlite_data:

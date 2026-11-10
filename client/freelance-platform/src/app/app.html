@@ -18,8 +18,8 @@
           </button>
           @if (userMenuOpen()) {
             <div class="user-menu-panel" id="user-menu-panel">
-              <a routerLink="/dashboard" (click)="closeUserMenu()">Мои заказы</a>
-              <a routerLink="/dashboard" (click)="closeUserMenu()">Мои отклики</a>
+              <a routerLink="/dashboard" (click)="openCabinet('customer')">Мои заказы</a>
+              <a routerLink="/dashboard" (click)="openCabinet('executor')">Мои отклики</a>
               <a routerLink="/profile" (click)="closeUserMenu()">Настройки</a>
               <span class="user-menu-divider" aria-hidden="true"></span>
               <button type="button" (click)="logout()">Выход</button>

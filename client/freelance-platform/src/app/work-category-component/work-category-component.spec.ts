@@ -36,7 +36,10 @@ describe('WorkCategoryComponent', () => {
     fixture.detectChanges();
 
     const request = httpTesting.expectOne('/task-categories/7');
+    const tasksRequest = httpTesting.expectOne('/tasks/unassigned');
     expect(request.request.method).toBe('GET');
+    expect(tasksRequest.request.method).toBe('GET');
+    tasksRequest.flush([]);
     request.flush({
       id: 7,
       name: 'Веб-разработка',

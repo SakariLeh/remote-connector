@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend_app.shared.jwt_authentication import CurrentUser, get_current_user, require_auth
+from backend_app.shared.jwt_authentication import (
+    CurrentUser,
+    allow_anonymous,
+    get_current_user,
+    require_auth,
+)
 from backend_app.tasks_microservice.DTO import (
     TaskAssignmentResponseDTO,
     TaskCreateDTO,
@@ -55,7 +60,7 @@ async def create_task(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
-@require_auth
+@allow_anonymous
 @tasks_router.get(
     "/unassigned",
     response_model=list[TaskResponseDTO],
@@ -171,7 +176,7 @@ async def select_actor(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
-@require_auth
+@allow_anonymous
 @tasks_router.get(
     "/{task_id}",
     response_model=TaskResponseDTO,

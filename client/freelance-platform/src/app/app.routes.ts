@@ -3,6 +3,7 @@ import { CanActivateFn, Router, Routes } from '@angular/router';
 import { AuthComponent } from './components/auth-component/auth-component';
 import { HomeComponent } from './components/home-component/home-component';
 import { ProfileComponent } from './components/profile-component/profile-component';
+import { TaskComponent } from './task-component/task-component';
 import { WorkCategoryComponent } from './work-category-component/work-category-component';
 import { AuthService } from './services/auth-service';
 import { UserDashboardComponent } from './components/dashboard/user-dashboard';
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'dashboard', component: UserDashboardComponent, canActivate: [requireUser] },
   { path: 'works/:id', component: WorkCategoryComponent },
+  { path: 'tasks/:id', component: TaskComponent },
   { path: 'auth', component: AuthComponent, canActivate: [requireGuest] },
   { path: 'profile', component: ProfileComponent, canActivate: [requireUser] },
 ];

@@ -10,6 +10,7 @@ describe('AuthService', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.removeItem('fp_auth');
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
@@ -34,6 +35,8 @@ describe('AuthService', () => {
       old_password: 'old-secret',
       new_password: 'new-secret',
     });
-    request.flush(null);
+    request.flush({ id: 4, email: 'user@example.com', jwt_token: 'next-token' });
+    expect(service.token()).toBe('next-token');
+    expect(service.user()).toEqual({ id: 4, email: 'user@example.com', role: undefined });
   });
 });

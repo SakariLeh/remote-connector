@@ -1,0 +1,65 @@
+<a class="back-link" [routerLink]="task() ? ['/works', task()!.task_category_id] : '/'">← К категории</a>
+
+@if (loading()) {
+  <section class="topic-heading">
+    <p class="eyebrow">Заказ</p>
+    <h1>Загрузка…</h1>
+  </section>
+} @else if (notFound()) {
+  <section class="not-found">
+    <p class="eyebrow">Страница не найдена</p>
+    <h1>Такого заказа нет</h1>
+    <a class="back-link" routerLink="/">Вернуться к направлениям</a>
+  </section>
+} @else if (error()) {
+  <section class="not-found">
+    <p class="eyebrow">Ошибка</p>
+    <h1>{{ error() }}</h1>
+    <a class="back-link" routerLink="/">Вернуться к направлениям</a>
+  </section>
+} @else if (task(); as selected) {
+  <section class="topic-heading">
+    <p class="eyebrow">{{ selected.task_category_name }}</p>
+    <h1>{{ selected.title }}</h1>
+    <p>{{ selected.description }}</p>
+    <p class="meta">{{ selected.price }} ₽ · {{ statusLabel[selected.status] }}</p>
+
+    @if (actionError()) {
+      <p class="message error" role="alert">{{ actionError() }}</p>
+    }
+
+    @if (!auth.user()) {
+      <p class="notice"><a routerLink="/auth">Войти</a>, чтобы откликнуться.</p>
+    } @else if (isPublisher(selected)) {
+      <div class="actions">
+        <button type="button" [disabled]="pending()" (click)="setStatus(selected.id, 'in_progress')">В работе</button>
+        <button type="button" [disabled]="pending()" (click)="setStatus(selected.id, 'completed')">Выполнен</button>
+      </div>
+      @if (assignments().length === 0) {
+        <p class="notice">Откликов пока нет.</p>
+      } @else {
+        <ul class="responses">
+          @for (row of assignments(); track row.id) {
+            <li>
+              <span>Исполнитель #{{ row.actor_id }} · {{ actorStatusLabel[row.actor_status] }}</span>
+              @if (row.actor_status === 1 && selected.actor_id !== row.actor_id) {
+                <button type="button" [disabled]="pending()" (click)="selectActor(selected.id, row.actor_id)">
+                  Выбрать
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      }
+    } @else if (mine(); as my) {
+      @if (my.actor_status === 1) {
+        <p class="notice">Вы откликнулись.</p>
+        <button type="button" [disabled]="pending()" (click)="decline(selected.id)">Отказаться</button>
+      } @else {
+        <p class="notice">{{ actorStatusLabel[my.actor_status] }}</p>
+      }
+    } @else {
+      <button type="button" [disabled]="pending()" (click)="subscribe(selected.id)">Откликнуться</button>
+    }
+  </section>
+}

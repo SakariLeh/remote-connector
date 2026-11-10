@@ -9,6 +9,7 @@ const STORAGE_KEY = 'fp_auth';
 export interface AuthUser {
   id: number;
   email: string;
+  role?: string;
 }
 
 interface JwtResponse {
@@ -57,20 +58,36 @@ export class AuthService {
     );
   }
 
-  updateProfile(
-    email: string,
-  ): Observable<AuthUser> {
-    return this.http
-      .post<AuthUser>('/profile/update', { email })
-      .pipe(catchError((err) => throwError(() => this.toMessage(err))));
+  updateProfile(email: string): Observable<AuthUser> {
+    return this.http.post<AuthUser>('/profile/update', { email }).pipe(
+      tap((user) => this.applyUser(user)),
+      catchError((err) => throwError(() => this.toMessage(err))),
+    );
   }
 
-  changePassword(oldPassword: string, newPassword: string): Observable<void> {
-    return this.http.post<void>('/auth/change-password', {
-      old_password: oldPassword,
-      new_password: newPassword,
-    })
-    .pipe(catchError((err) => throwError(() => this.toMessage(err))));
+  changePassword(oldPassword: string, newPassword: string): Observable<JwtResponse> {
+    return this.http
+      .post<JwtResponse>('/auth/change-password', {
+        old_password: oldPassword,
+        new_password: newPassword,
+      })
+      .pipe(
+        tap((res) => this.persist(res)),
+        catchError((err) => throwError(() => this.toMessage(err))),
+      );
+  }
+
+  applyUser(user: AuthUser): void {
+    const next: AuthUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role ?? this.user()?.role,
+    };
+    this.user.set(next);
+    const token = this.token();
+    if (token) {
+      this.write(token, next);
+    }
   }
 
   logout(): void {
@@ -83,15 +100,22 @@ export class AuthService {
   }
 
   private persist(res: JwtResponse): void {
-    const session: StoredSession = {
-      token: res.jwt_token,
-      user: { id: res.id, email: res.email },
+    const user: AuthUser = {
+      id: res.id,
+      email: res.email,
+      role: this.user()?.role,
     };
-    this.token.set(session.token);
-    this.user.set(session.user);
-    if (this.browser) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    this.token.set(res.jwt_token);
+    this.user.set(user);
+    this.write(res.jwt_token, user);
+  }
+
+  private write(token: string, user: AuthUser): void {
+    if (!this.browser) {
+      return;
     }
+    const session: StoredSession = { token, user };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   }
 
   private restore(): void {
@@ -136,12 +160,16 @@ export class AuthService {
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const token = auth.token();
-  if (!token) {
-    return next(req);
-  }
-  return next(
-    req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` },
+  const authed = token
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
+  return next(authed).pipe(
+    catchError((err: unknown) => {
+      const isLogin = req.url.includes('/auth/authorize') || req.url.includes('/auth/register');
+      if (err instanceof HttpErrorResponse && err.status === 401 && token && !isLogin) {
+        auth.logout();
+      }
+      return throwError(() => err);
     }),
   );
 };

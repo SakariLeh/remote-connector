@@ -10,3 +10,4 @@ class TaskRequestDTO(BaseModel):
     price: int | None = None
     status: TaskStatusTypes | None = None
     actor_id: int | None = None
+    task_category_id: int | None = None

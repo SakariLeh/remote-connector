@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from alembic import command
@@ -8,7 +9,7 @@ from backend_app.shared.db_context.fk_validation import validate_foreign_keys
 from backend_app.shared.db_context.models import import_all_models
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
-_ALEMBIC_INI = _REPO_ROOT / "alembic.ini"
+_ALEMBIC_INI = Path(os.environ.get("ALEMBIC_INI", _REPO_ROOT / "alembic.ini"))
 
 
 def run_migrations() -> None:

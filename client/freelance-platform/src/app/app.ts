@@ -3,7 +3,9 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DashboardStateService } from './services/dashboard-state-service';
 import { AuthService } from './services/auth-service';
+import type { UserRole } from './components/dashboard/types';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +15,7 @@ import { AuthService } from './services/auth-service';
 })
 export class App {
   protected readonly authService = inject(AuthService);
+  private readonly dashboardState = inject(DashboardStateService);
   protected readonly isDashboard = signal(false);
   protected readonly userMenuOpen = signal(false);
   private readonly router = inject(Router);
@@ -37,6 +40,11 @@ export class App {
 
   protected closeUserMenu(): void {
     this.userMenuOpen.set(false);
+  }
+
+  protected openCabinet(role: UserRole): void {
+    this.dashboardState.setRole(role);
+    this.closeUserMenu();
   }
 
   logout(): void {
