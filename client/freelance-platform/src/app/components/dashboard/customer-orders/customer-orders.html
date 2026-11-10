@@ -1,0 +1,48 @@
+<section class="customer-orders">
+  <div class="section-heading">
+    <h1>{{ text.title }}</h1>
+  </div>
+
+  <app-create-order (created)="load()" />
+
+  @if (error()) {
+    <p class="list-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="list-status">{{ text.loading }}</p>
+  } @else if (published().length === 0) {
+    <p class="list-status">{{ text.empty }}</p>
+  } @else {
+    <ul class="task-list">
+      @for (task of published(); track task.id) {
+        <li class="task-card">
+          <a [routerLink]="['/tasks', task.id]">{{ task.title }}</a>
+          <p>{{ task.price }} ₽ · {{ statusLabel[task.status] }}</p>
+          <div class="task-actions">
+            <button type="button" [disabled]="actionPending()" (click)="setStatus(task.id, 'in_progress')">
+              {{ text.inProgress }}
+            </button>
+            <button type="button" [disabled]="actionPending()" (click)="setStatus(task.id, 'completed')">
+              {{ text.completed }}
+            </button>
+          </div>
+          @for (row of assignmentsFor(task.id); track row.id) {
+            <div class="assignment">
+              <span>{{ text.actorPrefix }}{{ row.actor_id }} · {{ actorStatusLabel[row.actor_status] }}</span>
+              @if (row.actor_status === 1 && task.actor_id !== row.actor_id) {
+                <button
+                  type="button"
+                  [disabled]="actionPending()"
+                  (click)="selectActor(task.id, row.actor_id)"
+                >
+                  {{ text.selectActor }}
+                </button>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

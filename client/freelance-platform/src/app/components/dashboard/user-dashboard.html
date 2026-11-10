@@ -1,0 +1,16 @@
+<div class="user-dashboard">
+  <app-dashboard-header #dashboardHeader />
+  @if (error()) {
+    <p class="dashboard-error" role="alert">{{ error() }}</p>
+  }
+  <div class="dashboard-body">
+    <aside class="dashboard-sidebar-slot" aria-hidden="true"></aside>
+    <main class="dashboard-main">
+      @if (state.role() === 'customer') {
+        <app-customer-orders />
+      } @else {
+        <app-executor-board />
+      }
+    </main>
+  </div>
+</div>

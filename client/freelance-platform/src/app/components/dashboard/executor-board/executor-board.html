@@ -1,0 +1,37 @@
+<section class="executor-board">
+  @if (error()) {
+    <p class="list-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="list-status">{{ text.loading }}</p>
+  } @else {
+    <h1>{{ text.responsesTitle }}</h1>
+    @if (assignments().length === 0) {
+      <p class="list-status">{{ text.responsesEmpty }}</p>
+    } @else {
+      <ul class="task-list">
+        @for (row of assignments(); track row.id) {
+          <li class="task-card">
+            <a [routerLink]="['/tasks', row.task_id]">{{ text.orderPrefix }}{{ row.task_id }}</a>
+            <p>{{ actorStatusLabel[row.actor_status] }}</p>
+          </li>
+        }
+      </ul>
+    }
+
+    <h2>{{ text.feedTitle }}</h2>
+    @if (feed().length === 0) {
+      <p class="list-status">{{ text.feedEmpty }}</p>
+    } @else {
+      <ul class="task-list">
+        @for (task of feed(); track task.id) {
+          <li class="task-card">
+            <a [routerLink]="['/tasks', task.id]">{{ task.title }}</a>
+            <p>{{ task.task_category_name }} · {{ task.price }} ₽ · {{ statusLabel[task.status] }}</p>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>
