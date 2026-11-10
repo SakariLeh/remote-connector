@@ -36,6 +36,37 @@ export const DASHBOARD_TEXT = {
   dashboard: {
     content: 'Основной контент',
   },
+  customerOrders: {
+    title: 'Мои заказы',
+    empty: 'Вы ещё не публиковали заказы.',
+    loading: 'Загрузка…',
+    inProgress: 'В работе',
+    completed: 'Выполнен',
+    selectActor: 'Выбрать',
+    actorPrefix: 'Исполнитель #',
+  },
+  executorBoard: {
+    responsesTitle: 'Мои отклики',
+    responsesEmpty: 'Откликов пока нет.',
+    feedTitle: 'Свободные заказы',
+    feedEmpty: 'Свободных заказов нет.',
+    loading: 'Загрузка…',
+    orderPrefix: 'Заказ #',
+  },
+  createOrder: {
+    open: 'Создать заказ',
+    title: 'Новый заказ',
+    cancel: 'Отмена',
+    submit: 'Опубликовать',
+    submitting: 'Публикация…',
+    fields: {
+      title: 'Название',
+      description: 'Описание',
+      price: 'Цена, ₽',
+      category: 'Категория',
+      categoryPlaceholder: 'Выберите категорию',
+    },
+  },
   searchResults: 'Поиск:',
   errors: {
     load: 'Не удалось загрузить данные кабинета. Попробуйте обновить страницу.',

@@ -1,0 +1,48 @@
+<div class="create-order">
+  <button type="button" class="create-order-toggle" (click)="toggle()">
+    {{ open() ? text.cancel : text.open }}
+  </button>
+
+  @if (open()) {
+    <form class="create-order-form" [formGroup]="form" (ngSubmit)="submit()">
+      <h2>{{ text.title }}</h2>
+
+      <label>
+        {{ text.fields.title }}
+        <input type="text" formControlName="title" autocomplete="off" />
+      </label>
+
+      <label>
+        {{ text.fields.description }}
+        <textarea formControlName="description" rows="4"></textarea>
+      </label>
+
+      <label>
+        {{ text.fields.price }}
+        <input type="number" formControlName="price" min="1" step="1" />
+      </label>
+
+      <label>
+        {{ text.fields.category }}
+        <select formControlName="task_category_id">
+          <option [ngValue]="0" disabled>{{ text.fields.categoryPlaceholder }}</option>
+          @for (category of categories(); track category.id) {
+            <option [ngValue]="category.id">{{ category.name }}</option>
+          }
+        </select>
+      </label>
+
+      @if (categoriesError()) {
+        <p class="create-order-error" role="alert">{{ categoriesError() }}</p>
+      }
+
+      @if (error()) {
+        <p class="create-order-error" role="alert">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="pending() || form.invalid">
+        {{ pending() ? text.submitting : text.submit }}
+      </button>
+    </form>
+  }
+</div>
