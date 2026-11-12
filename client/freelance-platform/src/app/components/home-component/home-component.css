@@ -3,8 +3,6 @@
 }
 
 .hero {
-  --mx: 50%;
-  --my: 50%;
   position: relative;
   display: flex;
   min-height: 21rem;
@@ -14,21 +12,7 @@
   border-radius: 1.5rem;
   padding: clamp(2rem, 6vw, 4.5rem);
   color: #fff;
-  background: linear-gradient(115deg, rgb(13 29 50 / 72%), rgb(22 61 109 / 62%));
-}
-
-.hero-cursor-gradient {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle 22rem at var(--mx) var(--my),
-    var(--cursor-gradient-inner) 0%,
-    var(--cursor-gradient-outer) 42%,
-    transparent 100%
-  );
-  opacity: var(--cursor-gradient-opacity);
-  pointer-events: none;
-  will-change: background;
+  background: linear-gradient(115deg, rgb(13 29 50 / 88%), rgb(22 61 109 / 80%));
 }
 
 .hero-copy {

@@ -1,12 +1,4 @@
-import {
-  afterNextRender,
-  Component,
-  ElementRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   TaskCategory,
@@ -22,52 +14,45 @@ import {
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private readonly categoriesApi = inject(TaskCategoryService);
-  private readonly host = inject(ElementRef<HTMLElement>);
   private static readonly LERP_FACTOR = 0.08;
 
   protected readonly categories = signal<TaskCategory[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly mx = signal('50%');
-  protected readonly my = signal('50%');
 
   private targetX = 0;
   private targetY = 0;
   private currentX = 0;
   private currentY = 0;
   private animationFrame: number | null = null;
+  private cursorGradientInitialized = false;
   private cursorGradientEnabled = false;
   private pointerInWindow = false;
 
   private readonly handleMouseMove = (event: MouseEvent): void => {
     this.pointerInWindow = true;
-    const point = this.toHeroPoint(event.clientX, event.clientY);
-    if (!point) {
-      return;
-    }
-    this.targetX = point.x;
-    this.targetY = point.y;
+    this.targetX = event.clientX;
+    this.targetY = event.clientY;
     this.scheduleGradientFrame();
   };
 
   private readonly handleMouseLeave = (): void => {
     this.pointerInWindow = false;
-    this.setTargetToHeroCenter();
+    this.targetX = window.innerWidth / 2;
+    this.targetY = window.innerHeight / 2;
     this.scheduleGradientFrame();
   };
 
   private readonly handleResize = (): void => {
     if (!this.pointerInWindow) {
-      this.setTargetToHeroCenter();
+      this.targetX = window.innerWidth / 2;
+      this.targetY = window.innerHeight / 2;
       this.scheduleGradientFrame();
     }
   };
 
-  constructor() {
-    afterNextRender(() => this.initializeCursorGradient());
-  }
-
   ngOnInit(): void {
+    this.initializeCursorGradient();
     this.categoriesApi.getCategories().subscribe({
       next: (categories) => {
         this.categories.set(categories);
@@ -83,17 +68,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.cursorGradientEnabled) {
       window.removeEventListener('mousemove', this.handleMouseMove);
-      document.documentElement.removeEventListener('mouseleave', this.handleMouseLeave);
+      window.removeEventListener('mouseleave', this.handleMouseLeave);
       window.removeEventListener('resize', this.handleResize);
     }
 
     if (this.animationFrame !== null) {
       window.cancelAnimationFrame(this.animationFrame);
     }
-  }
 
-  private heroElement(): HTMLElement | null {
-    return this.host.nativeElement.querySelector('.hero');
+    if (this.cursorGradientInitialized) {
+      document.documentElement.style.removeProperty('--mx');
+      document.documentElement.style.removeProperty('--my');
+    }
   }
 
   private initializeCursorGradient(): void {
@@ -101,9 +87,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.setTargetToHeroCenter();
-    this.currentX = this.targetX;
-    this.currentY = this.targetY;
+    this.cursorGradientInitialized = true;
+    this.currentX = this.targetX = window.innerWidth / 2;
+    this.currentY = this.targetY = window.innerHeight / 2;
     this.writeGradientPosition();
 
     if (typeof window.matchMedia !== 'function') {
@@ -118,29 +104,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.cursorGradientEnabled = true;
     window.addEventListener('mousemove', this.handleMouseMove);
-    document.documentElement.addEventListener('mouseleave', this.handleMouseLeave);
+    window.addEventListener('mouseleave', this.handleMouseLeave);
     window.addEventListener('resize', this.handleResize);
-  }
-
-  private setTargetToHeroCenter(): void {
-    const hero = this.heroElement();
-    if (!hero) {
-      return;
-    }
-    this.targetX = hero.clientWidth / 2;
-    this.targetY = hero.clientHeight / 2;
-  }
-
-  private toHeroPoint(clientX: number, clientY: number): { x: number; y: number } | null {
-    const hero = this.heroElement();
-    if (!hero) {
-      return null;
-    }
-    const rect = hero.getBoundingClientRect();
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    };
   }
 
   private scheduleGradientFrame(): void {
@@ -166,7 +131,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private writeGradientPosition(): void {
-    this.mx.set(`${this.currentX}px`);
-    this.my.set(`${this.currentY}px`);
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty('--mx', `${this.currentX}px`);
+    rootStyle.setProperty('--my', `${this.currentY}px`);
   }
 }

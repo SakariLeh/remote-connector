@@ -18,10 +18,8 @@
 .landing-background-image {
   position: absolute;
   inset: 0;
-  background-image: url("/assets/images/landing-background.jpg");
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  /* SVG — лёгкая заглушка; замените её на WebP в public/assets/images и обновите URL. */
+  background: url("/assets/images/landing-background.svg") center / cover no-repeat;
   filter: blur(var(--bg-blur));
   transform: scale(1.1);
 }
@@ -30,6 +28,21 @@
   position: absolute;
   inset: 0;
   background: var(--bg-overlay);
+  /* Вместо тёмной заливки можно использовать backdrop-filter: blur(var(--bg-blur)). */
+}
+
+.landing-cursor-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 38rem at var(--mx, 50vw) var(--my, 50vh),
+    var(--cursor-gradient-inner) 0%,
+    var(--cursor-gradient-outer) 42%,
+    transparent 100%
+  );
+  opacity: var(--cursor-gradient-opacity);
+  mix-blend-mode: screen;
+  will-change: background;
 }
 
 .topbar {
