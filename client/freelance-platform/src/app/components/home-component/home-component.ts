@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
@@ -14,41 +15,42 @@ import {
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private readonly categoriesApi = inject(TaskCategoryService);
+  private readonly document = inject(DOCUMENT);
   private static readonly LERP_FACTOR = 0.08;
+  private static readonly STOP_THRESHOLD = 0.1;
 
   protected readonly categories = signal<TaskCategory[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
-  private targetX = 0;
-  private targetY = 0;
-  private currentX = 0;
-  private currentY = 0;
+  private windowRef: Window | null = null;
+  private hoverMedia: MediaQueryList | null = null;
+  private reducedMotionMedia: MediaQueryList | null = null;
+  private targetX = 50;
+  private targetY = 50;
+  private currentX = 50;
+  private currentY = 50;
   private animationFrame: number | null = null;
-  private cursorGradientInitialized = false;
   private cursorGradientEnabled = false;
-  private pointerInWindow = false;
 
-  private readonly handleMouseMove = (event: MouseEvent): void => {
-    this.pointerInWindow = true;
-    this.targetX = event.clientX;
-    this.targetY = event.clientY;
-    this.scheduleGradientFrame();
-  };
-
-  private readonly handleMouseLeave = (): void => {
-    this.pointerInWindow = false;
-    this.targetX = window.innerWidth / 2;
-    this.targetY = window.innerHeight / 2;
-    this.scheduleGradientFrame();
-  };
-
-  private readonly handleResize = (): void => {
-    if (!this.pointerInWindow) {
-      this.targetX = window.innerWidth / 2;
-      this.targetY = window.innerHeight / 2;
-      this.scheduleGradientFrame();
+  private readonly handlePointerMove = (event: PointerEvent): void => {
+    if (!this.windowRef) {
+      return;
     }
+
+    this.targetX = (event.clientX / this.windowRef.innerWidth) * 100;
+    this.targetY = (event.clientY / this.windowRef.innerHeight) * 100;
+    this.scheduleGradientFrame();
+  };
+
+  private readonly handlePointerLeave = (): void => {
+    this.targetX = 50;
+    this.targetY = 50;
+    this.scheduleGradientFrame();
+  };
+
+  private readonly handleMediaChange = (): void => {
+    this.updateCursorGradient();
   };
 
   ngOnInit(): void {
@@ -66,51 +68,69 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.cursorGradientEnabled) {
-      window.removeEventListener('mousemove', this.handleMouseMove);
-      window.removeEventListener('mouseleave', this.handleMouseLeave);
-      window.removeEventListener('resize', this.handleResize);
-    }
-
-    if (this.animationFrame !== null) {
-      window.cancelAnimationFrame(this.animationFrame);
-    }
-
-    if (this.cursorGradientInitialized) {
-      document.documentElement.style.removeProperty('--mx');
-      document.documentElement.style.removeProperty('--my');
-    }
+    this.detachCursorTracking();
+    this.hoverMedia?.removeEventListener('change', this.handleMediaChange);
+    this.reducedMotionMedia?.removeEventListener('change', this.handleMediaChange);
+    this.document.documentElement.style.removeProperty('--mx');
+    this.document.documentElement.style.removeProperty('--my');
   }
 
   private initializeCursorGradient(): void {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
+    const windowRef = this.document.defaultView;
+    if (!windowRef || typeof windowRef.matchMedia !== 'function') {
       return;
     }
 
-    this.cursorGradientInitialized = true;
-    this.currentX = this.targetX = window.innerWidth / 2;
-    this.currentY = this.targetY = window.innerHeight / 2;
+    this.windowRef = windowRef;
     this.writeGradientPosition();
 
-    if (typeof window.matchMedia !== 'function') {
+    this.hoverMedia = windowRef.matchMedia('(hover: none)');
+    this.reducedMotionMedia = windowRef.matchMedia('(prefers-reduced-motion: reduce)');
+    this.hoverMedia.addEventListener('change', this.handleMediaChange);
+    this.reducedMotionMedia.addEventListener('change', this.handleMediaChange);
+    this.updateCursorGradient();
+  }
+
+  private updateCursorGradient(): void {
+    const shouldTrack =
+      this.hoverMedia !== null &&
+      !this.hoverMedia.matches &&
+      this.reducedMotionMedia !== null &&
+      !this.reducedMotionMedia.matches;
+
+    if (shouldTrack === this.cursorGradientEnabled) {
       return;
     }
 
-    const hasFineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!hasFineHover || reducedMotion) {
+    if (shouldTrack) {
+      this.cursorGradientEnabled = true;
+      this.windowRef?.addEventListener('pointermove', this.handlePointerMove, { passive: true });
+      this.document.documentElement.addEventListener('pointerleave', this.handlePointerLeave, {
+        passive: true,
+      });
       return;
     }
 
-    this.cursorGradientEnabled = true;
-    window.addEventListener('mousemove', this.handleMouseMove);
-    window.addEventListener('mouseleave', this.handleMouseLeave);
-    window.addEventListener('resize', this.handleResize);
+    this.detachCursorTracking();
+    this.currentX = this.targetX = 50;
+    this.currentY = this.targetY = 50;
+    this.writeGradientPosition();
+  }
+
+  private detachCursorTracking(): void {
+    this.cursorGradientEnabled = false;
+    this.windowRef?.removeEventListener('pointermove', this.handlePointerMove);
+    this.document.documentElement.removeEventListener('pointerleave', this.handlePointerLeave);
+
+    if (this.animationFrame !== null) {
+      this.windowRef?.cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = null;
+    }
   }
 
   private scheduleGradientFrame(): void {
-    if (this.animationFrame === null) {
-      this.animationFrame = window.requestAnimationFrame(() => this.animateGradient());
+    if (this.windowRef && this.animationFrame === null) {
+      this.animationFrame = this.windowRef.requestAnimationFrame(() => this.animateGradient());
     }
   }
 
@@ -118,21 +138,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.animationFrame = null;
     this.currentX += (this.targetX - this.currentX) * HomeComponent.LERP_FACTOR;
     this.currentY += (this.targetY - this.currentY) * HomeComponent.LERP_FACTOR;
-    this.writeGradientPosition();
 
-    if (Math.hypot(this.targetX - this.currentX, this.targetY - this.currentY) < 0.1) {
+    if (
+      Math.abs(this.targetX - this.currentX) < HomeComponent.STOP_THRESHOLD &&
+      Math.abs(this.targetY - this.currentY) < HomeComponent.STOP_THRESHOLD
+    ) {
       this.currentX = this.targetX;
       this.currentY = this.targetY;
-      this.writeGradientPosition();
-      return;
     }
 
-    this.scheduleGradientFrame();
+    this.writeGradientPosition();
+
+    if (
+      Math.abs(this.targetX - this.currentX) >= HomeComponent.STOP_THRESHOLD ||
+      Math.abs(this.targetY - this.currentY) >= HomeComponent.STOP_THRESHOLD
+    ) {
+      this.scheduleGradientFrame();
+    }
   }
 
   private writeGradientPosition(): void {
-    const rootStyle = document.documentElement.style;
-    rootStyle.setProperty('--mx', `${this.currentX}px`);
-    rootStyle.setProperty('--my', `${this.currentY}px`);
+    const rootStyle = this.document.documentElement.style;
+    rootStyle.setProperty('--mx', `${this.currentX}%`);
+    rootStyle.setProperty('--my', `${this.currentY}%`);
   }
 }

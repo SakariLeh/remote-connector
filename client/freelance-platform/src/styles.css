@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
-  --font-main: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --bg-blur: 8px;
+  --font-main: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bg-blur: 16px;
   --bg-overlay: rgb(5 12 23 / 48%);
   --cursor-gradient-inner: rgb(62 145 242 / 42%);
   --cursor-gradient-outer: rgb(51 126 222 / 18%);
@@ -61,7 +61,8 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 

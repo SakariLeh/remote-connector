@@ -1,9 +1,10 @@
 :host {
+  position: relative;
   display: block;
   min-height: 100dvh;
   font-family: var(--font-main);
   color: #e8eef8;
-  background: #091525;
+  background: transparent;
 }
 
 .landing-background {
@@ -18,31 +19,43 @@
 .landing-background-image {
   position: absolute;
   inset: 0;
-  /* SVG — лёгкая заглушка; замените её на WebP в public/assets/images и обновите URL. */
   background: url("/assets/images/landing-background.svg") center / cover no-repeat;
-  filter: blur(var(--bg-blur));
-  transform: scale(1.1);
+  pointer-events: none;
 }
 
 .landing-background-overlay {
   position: absolute;
   inset: 0;
   background: var(--bg-overlay);
-  /* Вместо тёмной заливки можно использовать backdrop-filter: blur(var(--bg-blur)). */
+  -webkit-backdrop-filter: blur(var(--bg-blur));
+  backdrop-filter: blur(var(--bg-blur));
+  pointer-events: none;
 }
 
 .landing-cursor-gradient {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    circle 38rem at var(--mx, 50vw) var(--my, 50vh),
+    circle 38rem at 50% 50%,
     var(--cursor-gradient-inner) 0%,
     var(--cursor-gradient-outer) 42%,
     transparent 100%
   );
   opacity: var(--cursor-gradient-opacity);
   mix-blend-mode: screen;
-  will-change: background;
+  transform: translate3d(
+    calc(var(--mx, 50%) - 50%),
+    calc(var(--my, 50%) - 50%),
+    0
+  );
+  will-change: transform;
+  pointer-events: none;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .landing-background-overlay {
+    background: rgb(5 12 23 / 68%);
+  }
 }
 
 .topbar {
@@ -201,6 +214,10 @@
 }
 
 @media (max-width: 620px) {
+  :host {
+    --bg-blur: 10px;
+  }
+
   .topbar {
     padding-right: 1rem;
     padding-left: 1rem;
