@@ -1,10 +1,9 @@
 :host {
-  position: relative;
   display: block;
   min-height: 100dvh;
   font-family: var(--font-main);
   color: #e8eef8;
-  background: transparent;
+  background: #091525;
 }
 
 .landing-background {
@@ -18,8 +17,12 @@
 
 .landing-background-image {
   position: absolute;
-  inset: 0;
-  background: url("/assets/images/landing-background.svg") center / cover no-repeat;
+  inset: -1.5rem;
+  background: url("/assets/images/landing-background.jpg") center / cover no-repeat;
+  filter: blur(var(--bg-blur));
+  transform: scale(1.08);
+  transform-origin: center;
+  will-change: filter;
   pointer-events: none;
 }
 
@@ -27,35 +30,7 @@
   position: absolute;
   inset: 0;
   background: var(--bg-overlay);
-  -webkit-backdrop-filter: blur(var(--bg-blur));
-  backdrop-filter: blur(var(--bg-blur));
   pointer-events: none;
-}
-
-.landing-cursor-gradient {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle 38rem at 50% 50%,
-    var(--cursor-gradient-inner) 0%,
-    var(--cursor-gradient-outer) 42%,
-    transparent 100%
-  );
-  opacity: var(--cursor-gradient-opacity);
-  mix-blend-mode: screen;
-  transform: translate3d(
-    calc(var(--mx, 50%) - 50%),
-    calc(var(--my, 50%) - 50%),
-    0
-  );
-  will-change: transform;
-  pointer-events: none;
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .landing-background-overlay {
-    background: rgb(5 12 23 / 68%);
-  }
 }
 
 .topbar {
@@ -215,7 +190,7 @@
 
 @media (max-width: 620px) {
   :host {
-    --bg-blur: 10px;
+    --bg-blur: 8px;
   }
 
   .topbar {

@@ -1,5 +1,12 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   TaskCategory,
@@ -15,46 +22,67 @@ import {
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private readonly categoriesApi = inject(TaskCategoryService);
-  private readonly document = inject(DOCUMENT);
+  private readonly host = inject(ElementRef<HTMLElement>);
   private static readonly LERP_FACTOR = 0.08;
   private static readonly STOP_THRESHOLD = 0.1;
 
   protected readonly categories = signal<TaskCategory[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly mx = signal('50%');
+  protected readonly my = signal('50%');
 
-  private windowRef: Window | null = null;
-  private hoverMedia: MediaQueryList | null = null;
-  private reducedMotionMedia: MediaQueryList | null = null;
-  private targetX = 50;
-  private targetY = 50;
-  private currentX = 50;
-  private currentY = 50;
+  private targetX = 0;
+  private targetY = 0;
+  private currentX = 0;
+  private currentY = 0;
   private animationFrame: number | null = null;
   private cursorGradientEnabled = false;
+  private pointerOnHero = false;
+  private hero: HTMLElement | null = null;
+  private hoverMedia: MediaQueryList | null = null;
+  private reducedMotionMedia: MediaQueryList | null = null;
 
   private readonly handlePointerMove = (event: PointerEvent): void => {
-    if (!this.windowRef) {
+    if (!this.pointerOnHero || !this.hero) {
       return;
     }
 
-    this.targetX = (event.clientX / this.windowRef.innerWidth) * 100;
-    this.targetY = (event.clientY / this.windowRef.innerHeight) * 100;
+    const rect = this.hero.getBoundingClientRect();
+    this.targetX = event.clientX - rect.left;
+    this.targetY = event.clientY - rect.top;
     this.scheduleGradientFrame();
   };
 
+  private readonly handlePointerEnter = (event: PointerEvent): void => {
+    this.pointerOnHero = true;
+    this.handlePointerMove(event);
+  };
+
   private readonly handlePointerLeave = (): void => {
-    this.targetX = 50;
-    this.targetY = 50;
+    this.pointerOnHero = false;
+    this.setTargetToHeroCenter();
     this.scheduleGradientFrame();
+  };
+
+  private readonly handleResize = (): void => {
+    if (!this.pointerOnHero) {
+      this.setTargetToHeroCenter();
+      this.currentX = this.targetX;
+      this.currentY = this.targetY;
+      this.writeGradientPosition();
+    }
   };
 
   private readonly handleMediaChange = (): void => {
     this.updateCursorGradient();
   };
 
+  constructor() {
+    afterNextRender(() => this.initializeCursorGradient());
+  }
+
   ngOnInit(): void {
-    this.initializeCursorGradient();
     this.categoriesApi.getCategories().subscribe({
       next: (categories) => {
         this.categories.set(categories);
@@ -71,30 +99,32 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.detachCursorTracking();
     this.hoverMedia?.removeEventListener('change', this.handleMediaChange);
     this.reducedMotionMedia?.removeEventListener('change', this.handleMediaChange);
-    this.document.documentElement.style.removeProperty('--mx');
-    this.document.documentElement.style.removeProperty('--my');
+    window.removeEventListener('resize', this.handleResize);
   }
 
   private initializeCursorGradient(): void {
-    const windowRef = this.document.defaultView;
-    if (!windowRef || typeof windowRef.matchMedia !== 'function') {
+    this.hero = this.host.nativeElement.querySelector('.hero');
+    if (!this.hero || typeof window.matchMedia !== 'function') {
       return;
     }
 
-    this.windowRef = windowRef;
+    this.setTargetToHeroCenter();
+    this.currentX = this.targetX;
+    this.currentY = this.targetY;
     this.writeGradientPosition();
 
-    this.hoverMedia = windowRef.matchMedia('(hover: none)');
-    this.reducedMotionMedia = windowRef.matchMedia('(prefers-reduced-motion: reduce)');
+    this.hoverMedia = window.matchMedia('(hover: hover) and (pointer: fine)');
+    this.reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
     this.hoverMedia.addEventListener('change', this.handleMediaChange);
     this.reducedMotionMedia.addEventListener('change', this.handleMediaChange);
+    window.addEventListener('resize', this.handleResize, { passive: true });
     this.updateCursorGradient();
   }
 
   private updateCursorGradient(): void {
     const shouldTrack =
       this.hoverMedia !== null &&
-      !this.hoverMedia.matches &&
+      this.hoverMedia.matches &&
       this.reducedMotionMedia !== null &&
       !this.reducedMotionMedia.matches;
 
@@ -103,34 +133,52 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     if (shouldTrack) {
-      this.cursorGradientEnabled = true;
-      this.windowRef?.addEventListener('pointermove', this.handlePointerMove, { passive: true });
-      this.document.documentElement.addEventListener('pointerleave', this.handlePointerLeave, {
-        passive: true,
-      });
+      this.attachCursorTracking();
       return;
     }
 
     this.detachCursorTracking();
-    this.currentX = this.targetX = 50;
-    this.currentY = this.targetY = 50;
+    this.pointerOnHero = false;
+    this.setTargetToHeroCenter();
+    this.currentX = this.targetX;
+    this.currentY = this.targetY;
     this.writeGradientPosition();
+  }
+
+  private attachCursorTracking(): void {
+    if (!this.hero) {
+      return;
+    }
+
+    this.cursorGradientEnabled = true;
+    this.hero.addEventListener('pointerenter', this.handlePointerEnter, { passive: true });
+    this.hero.addEventListener('pointermove', this.handlePointerMove, { passive: true });
+    this.hero.addEventListener('pointerleave', this.handlePointerLeave, { passive: true });
   }
 
   private detachCursorTracking(): void {
     this.cursorGradientEnabled = false;
-    this.windowRef?.removeEventListener('pointermove', this.handlePointerMove);
-    this.document.documentElement.removeEventListener('pointerleave', this.handlePointerLeave);
+    this.hero?.removeEventListener('pointerenter', this.handlePointerEnter);
+    this.hero?.removeEventListener('pointermove', this.handlePointerMove);
+    this.hero?.removeEventListener('pointerleave', this.handlePointerLeave);
 
     if (this.animationFrame !== null) {
-      this.windowRef?.cancelAnimationFrame(this.animationFrame);
+      window.cancelAnimationFrame(this.animationFrame);
       this.animationFrame = null;
     }
   }
 
+  private setTargetToHeroCenter(): void {
+    if (!this.hero) {
+      return;
+    }
+    this.targetX = this.hero.clientWidth / 2;
+    this.targetY = this.hero.clientHeight / 2;
+  }
+
   private scheduleGradientFrame(): void {
-    if (this.windowRef && this.animationFrame === null) {
-      this.animationFrame = this.windowRef.requestAnimationFrame(() => this.animateGradient());
+    if (this.animationFrame === null) {
+      this.animationFrame = window.requestAnimationFrame(() => this.animateGradient());
     }
   }
 
@@ -145,21 +193,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     ) {
       this.currentX = this.targetX;
       this.currentY = this.targetY;
+      this.writeGradientPosition();
+      return;
     }
 
     this.writeGradientPosition();
-
-    if (
-      Math.abs(this.targetX - this.currentX) >= HomeComponent.STOP_THRESHOLD ||
-      Math.abs(this.targetY - this.currentY) >= HomeComponent.STOP_THRESHOLD
-    ) {
-      this.scheduleGradientFrame();
-    }
+    this.scheduleGradientFrame();
   }
 
   private writeGradientPosition(): void {
-    const rootStyle = this.document.documentElement.style;
-    rootStyle.setProperty('--mx', `${this.currentX}%`);
-    rootStyle.setProperty('--my', `${this.currentY}%`);
+    this.mx.set(`${this.currentX}px`);
+    this.my.set(`${this.currentY}px`);
   }
 }

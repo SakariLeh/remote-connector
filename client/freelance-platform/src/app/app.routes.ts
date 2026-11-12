@@ -14,11 +14,21 @@ const requireUser: CanActivateFn = () =>
 const requireGuest: CanActivateFn = () =>
   inject(AuthService).user() ? inject(Router).createUrlTree(['/profile']) : true;
 
+
+const rootRedirectGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.user() ? router.createUrlTree(['/dashboard']) : router.createUrlTree(['/landing']);
+}
+
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', canActivate: [rootRedirectGuard], children: []},
+  { path: 'landing', component: HomeComponent },
   { path: 'dashboard', component: UserDashboardComponent, canActivate: [requireUser] },
   { path: 'works/:id', component: WorkCategoryComponent },
   { path: 'tasks/:id', component: TaskComponent },
   { path: 'auth', component: AuthComponent, canActivate: [requireGuest] },
   { path: 'profile', component: ProfileComponent, canActivate: [requireUser] },
+  { path: '**', redirectTo: '' },
 ];
