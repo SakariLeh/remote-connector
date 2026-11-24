@@ -13,8 +13,12 @@
   overflow: hidden;
   border-radius: 1.5rem;
   padding: clamp(2rem, 6vw, 4.5rem);
-  color: #fff;
-  background: linear-gradient(115deg, rgb(13 29 50 / 72%), rgb(22 61 109 / 62%));
+  color: var(--dashboard-text);
+  background: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--dashboard-surface) 92%, transparent),
+    color-mix(in srgb, var(--dashboard-accent) 34%, var(--dashboard-surface))
+  );
 }
 
 .hero-cursor-gradient {
@@ -39,7 +43,7 @@
 
 .eyebrow {
   margin: 0 0 0.8rem;
-  color: #85b5f6;
+  color: var(--dashboard-accent);
   font-size: 0.78rem;
   font-weight: 750;
   letter-spacing: 0.1em;
@@ -47,7 +51,7 @@
 }
 
 .hero .eyebrow {
-  color: #c1d8f8;
+  color: color-mix(in srgb, var(--dashboard-text) 82%, transparent);
 }
 
 h1 {
@@ -60,7 +64,7 @@ h1 {
 .hero-description {
   max-width: 32rem;
   margin: 1.2rem 0 1.6rem;
-  color: #d4dfef;
+  color: var(--dashboard-muted);
   font-size: 1.08rem;
   line-height: 1.65;
 }
@@ -82,8 +86,8 @@ h1 {
 }
 
 .primary-button {
-  color: #10233c;
-  background: #fff;
+  color: var(--dashboard-on-accent);
+  background: var(--dashboard-accent);
 }
 
 .primary-button:hover,
@@ -115,7 +119,7 @@ h1 {
 
 h2 {
   margin: 0;
-  color: #f0f5ff;
+  color: var(--dashboard-text);
   font-size: clamp(1.7rem, 3vw, 2.3rem);
   letter-spacing: -0.04em;
 }
@@ -123,7 +127,7 @@ h2 {
 .section-description {
   max-width: 26rem;
   margin: 0 0 0.2rem;
-  color: #aebed4;
+  color: var(--dashboard-muted);
   line-height: 1.6;
 }
 
@@ -135,10 +139,10 @@ h2 {
 
 .category-card {
   min-width: 0;
-  border: 1px solid #263d5b;
+  border: 1px solid var(--dashboard-border);
   border-radius: 1rem;
   padding: 1.3rem;
-  background: #10233c;
+  background: var(--dashboard-surface);
   box-shadow: 0 0.4rem 1.3rem rgb(0 0 0 / 14%);
   transition:
     transform 160ms ease,
@@ -152,7 +156,7 @@ h2 {
 
 .category-card h3 {
   margin: 0 0 0.35rem;
-  color: #f1f5fc;
+  color: var(--dashboard-text);
   font-size: 1.05rem;
   letter-spacing: -0.02em;
 }
@@ -160,7 +164,7 @@ h2 {
 .category-description {
   min-height: 2.7em;
   margin: 0;
-  color: #aebed4;
+  color: var(--dashboard-muted);
   font-size: 0.88rem;
   line-height: 1.5;
 }
@@ -196,10 +200,10 @@ h2 {
   justify-content: space-between;
   gap: 1.5rem;
   margin: 0 0 2rem;
-  border: 1px solid #263d5b;
+  border: 1px solid var(--dashboard-border);
   border-radius: 1.2rem;
   padding: 1.8rem 2rem;
-  background: #10233c;
+  background: var(--dashboard-surface);
 }
 
 .bottom-cta h2 {
@@ -208,14 +212,14 @@ h2 {
 
 .bottom-cta p {
   margin: 0.4rem 0 0;
-  color: #aebed4;
+  color: var(--dashboard-muted);
   line-height: 1.5;
 }
 
 .secondary-button {
   flex-shrink: 0;
   color: #fff;
-  background: #2861a8;
+  background: var(--dashboard-accent);
 }
 
 .secondary-button:hover {

@@ -11,12 +11,14 @@ export interface AuthUser {
   name?: string;
   email: string;
   role?: string;
+  requires_password_change?: boolean;
 }
 
 interface JwtResponse {
   id: number;
   email: string;
   jwt_token: string;
+  requires_password_change?: boolean;
 }
 
 interface StoredSession {
@@ -89,6 +91,9 @@ export class AuthService {
       id: user.id,
       email: user.email,
       role: user.role ?? this.user()?.role,
+      name: user.name ?? this.user()?.name,
+      requires_password_change:
+        user.requires_password_change ?? this.user()?.requires_password_change ?? false,
     };
     this.user.set(next);
     const token = this.token();
@@ -111,6 +116,7 @@ export class AuthService {
       id: res.id,
       email: res.email,
       role: this.user()?.role,
+      requires_password_change: res.requires_password_change ?? false,
     };
     this.token.set(res.jwt_token);
     this.user.set(user);

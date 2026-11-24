@@ -46,6 +46,7 @@ class UserRepository:
 
         user = UserEntity(
             name=dto.name or "",
+            requires_password_change=False,
             email=dto.email,
             hashed_password=dto.hashed_password.get_secret_value(),
             role=dto.role,
@@ -73,6 +74,8 @@ class UserRepository:
             user.role = dto.role
         if dto.hashed_password is not None:
             user.hashed_password = dto.hashed_password.get_secret_value()
+        if dto.requires_password_change is not None:
+            user.requires_password_change = dto.requires_password_change
 
         print("[Repository] 3 step: Updated user")
         await self.db.commit()

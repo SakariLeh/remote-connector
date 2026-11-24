@@ -7,5 +7,6 @@ class UserCredentialsDTO(BaseModel):
     email: EmailStr | None = None
     role: str | None = None
     hashed_password: SecretStr | None = None
+    requires_password_change: bool | None = None
 
     model_config = ConfigDict(from_attributes=True)

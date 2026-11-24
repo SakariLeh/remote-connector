@@ -2,8 +2,8 @@
   display: block;
   min-height: 100dvh;
   font-family: var(--font-main);
-  color: #e8eef8;
-  background: #091525;
+  color: var(--dashboard-text);
+  background: var(--dashboard-page);
 }
 
 .landing-background {
@@ -42,8 +42,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem max(1.25rem, calc((100vw - 76rem) / 2));
-  border-bottom: 1px solid #20344e;
-  background: rgb(9 21 37 / 94%);
+  border-bottom: 1px solid var(--dashboard-border);
+  background: color-mix(in srgb, var(--dashboard-header) 94%, transparent);
   backdrop-filter: blur(12px);
 }
 
@@ -51,7 +51,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  color: #f0f5ff;
+  color: var(--dashboard-text);
   font-size: 1.05rem;
   font-weight: 750;
   text-decoration: none;
@@ -64,7 +64,7 @@
   place-items: center;
   border-radius: 0.6rem;
   color: #fff;
-  background: #2861a8;
+  background: var(--dashboard-accent);
 }
 
 .nav {
@@ -74,14 +74,14 @@
 }
 
 .nav > a {
-  color: #adc8ed;
+  color: var(--dashboard-muted);
   text-decoration: none;
   font-size: 0.92rem;
   cursor: pointer;
 }
 
 .nav > a:hover {
-  color: #fff;
+  color: var(--dashboard-text);
 }
 
 .user-menu {
@@ -94,10 +94,10 @@
   gap: 0.65rem;
   min-height: 2.5rem;
   padding: 0.25rem 0.65rem 0.25rem 0.3rem;
-  border: 1px solid #29415f;
+  border: 1px solid var(--dashboard-border);
   border-radius: 999px;
-  color: #e8eef8;
-  background: #10233b;
+  color: var(--dashboard-text);
+  background: var(--dashboard-surface);
   font: inherit;
   cursor: pointer;
 }
@@ -142,9 +142,9 @@
   display: grid;
   min-width: 12rem;
   padding: 0.4rem;
-  border: 1px solid #29415f;
+  border: 1px solid var(--dashboard-border);
   border-radius: 0.75rem;
-  background: #10233b;
+  background: var(--dashboard-header);
   box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 28%);
 }
 

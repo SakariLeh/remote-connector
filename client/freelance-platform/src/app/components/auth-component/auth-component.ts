@@ -48,7 +48,9 @@ export class AuthComponent {
     request.subscribe({
       next: () => {
         this.pending.set(false);
-        void this.router.navigate(['/profile']);
+        const requiresChange =
+          this.authService.user()?.requires_password_change === true;
+        void this.router.navigate([requiresChange ? '/profile' : '/dashboard']);
       },
       error: (message: string) => {
         this.error.set(message);

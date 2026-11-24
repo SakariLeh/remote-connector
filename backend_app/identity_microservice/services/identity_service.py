@@ -48,11 +48,24 @@ class IdentityService:
             raise ValueError("Invalid old password") from None   
         hashed_pass = self.ph.hash(dto.new_password)  
         print("[Service] 3 step: Hashed new password")
-        await self.user_repo.update_user(UserCredentialsDTO(id=id, email=user.email, hashed_password=SecretStr(hashed_pass), role=user.role))  
+        await self.user_repo.update_user(
+            UserCredentialsDTO(
+                id=id,
+                email=user.email,
+                hashed_password=SecretStr(hashed_pass),
+                role=user.role,
+                requires_password_change=False,
+            )
+        )
         print("[Service] 4 step: Updated credentials")
         jwt_token = create_access_token(id, user.email, user.role)    
         print("[Service] 5 step: Created JWT token")
-        return JwtResponseDTO(id=id, email=user.email, jwt_token=jwt_token)
+        return JwtResponseDTO(
+            id=id,
+            email=user.email,
+            jwt_token=jwt_token,
+            requires_password_change=False,
+        )
 
     async def authorize_user(self, auth_dto: UserAuthDTO) -> JwtResponseDTO:
         """Authorize a user and return a JWT wrapped in JwtResponseDTO."""
@@ -73,7 +86,12 @@ class IdentityService:
                 raise ValueError("Invalid password") from None
 
             jwt_token = create_access_token(user.id, user.email, user.role)
-            return JwtResponseDTO(id=user.id, email=user.email, jwt_token=jwt_token)
+            return JwtResponseDTO(
+                id=user.id,
+                email=user.email,
+                jwt_token=jwt_token,
+                requires_password_change=user.requires_password_change,
+            )
         except ValueError:
             raise
         except Exception as error:

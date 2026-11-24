@@ -6,11 +6,11 @@
   max-width: 48rem;
   margin: 0 auto;
   padding: 2rem;
-  border: 1px solid #263d5b;
-  border-radius: 1rem;
-  background: #10233c;
-  color: #e8eef8;
-  box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+  border: 1px solid var(--dashboard-border);
+  border-radius: var(--dashboard-radius);
+  background: var(--dashboard-surface);
+  color: var(--dashboard-text);
+  box-shadow: var(--dashboard-shadow);
 }
 
 .profile-heading {
@@ -23,7 +23,7 @@
 
 .eyebrow {
   margin: 0 0 0.35rem;
-  color: #91b9f4;
+  color: var(--dashboard-accent);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -32,14 +32,14 @@
 
 h1 {
   margin: 0;
-  color: #f1f5fc;
+  color: var(--dashboard-text);
   font-size: 1.75rem;
 }
 
 .profile-heading p:not(.eyebrow),
 .empty-state p {
   margin: 0.4rem 0 0;
-  color: #aebed4;
+  color: var(--dashboard-muted);
 }
 
 .user-id {
@@ -52,8 +52,8 @@ h1 {
   height: 3rem;
   place-items: center;
   border-radius: 50%;
-  background: #203d64;
-  color: #b7d3fa;
+  background: linear-gradient(135deg, var(--dashboard-avatar-start), var(--dashboard-avatar-end));
+  color: var(--dashboard-on-accent);
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -66,7 +66,7 @@ form {
 .field {
   display: grid;
   gap: 0.45rem;
-  color: #c4d2e5;
+  color: var(--dashboard-text);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -75,10 +75,10 @@ input {
   width: 100%;
   box-sizing: border-box;
   padding: 0.75rem 0.85rem;
-  border: 1px solid #355274;
+  border: 1px solid var(--dashboard-border);
   border-radius: 0.55rem;
-  background: #0c1c30;
-  color: #eef4ff;
+  background: var(--dashboard-page);
+  color: var(--dashboard-text);
   font: inherit;
   font-weight: 400;
   outline: none;
@@ -105,7 +105,7 @@ button {
   padding: 0.75rem 1.15rem;
   border: 0;
   border-radius: 0.55rem;
-  background: #2861a8;
+  background: var(--dashboard-accent);
   color: #fff;
   font: inherit;
   font-weight: 600;
@@ -113,7 +113,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: #3975c1;
+  background: var(--dashboard-accent-strong);
 }
 
 button:disabled {

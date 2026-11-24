@@ -1,13 +1,14 @@
 .card {
   max-width: 28rem;
   margin: 0 auto;
-  background: #10233c;
-  border: 1px solid #263d5b;
-  border-radius: 0.75rem;
+  background: var(--dashboard-surface);
+  border: 1px solid var(--dashboard-border);
+  border-radius: var(--dashboard-radius);
   padding: 1.5rem;
   display: grid;
   gap: 1rem;
-  color: #e8eef8;
+  color: var(--dashboard-text);
+  box-shadow: var(--dashboard-shadow);
 }
 
 h1 {
@@ -23,18 +24,18 @@ h1 {
 
 .tabs button {
   flex: 1;
-  border: 1px solid #355274;
-  color: #c4d2e5;
-  background: #142a46;
+  border: 1px solid var(--dashboard-border);
+  color: var(--dashboard-muted);
+  background: var(--dashboard-page);
   border-radius: 0.5rem;
   padding: 0.5rem;
   cursor: pointer;
 }
 
 .tabs button.active {
-  background: #2861a8;
-  border-color: #2861a8;
-  color: #fff;
+  background: var(--dashboard-accent);
+  border-color: var(--dashboard-accent);
+  color: var(--dashboard-on-accent);
 }
 
 form {
@@ -50,10 +51,10 @@ label {
 
 input {
   padding: 0.55rem 0.65rem;
-  border: 1px solid #355274;
+  border: 1px solid var(--dashboard-border);
   border-radius: 0.45rem;
-  background: #0c1c30;
-  color: #eef4ff;
+  background: var(--dashboard-page);
+  color: var(--dashboard-text);
   font: inherit;
 }
 
@@ -61,8 +62,8 @@ button[type='submit'],
 .card > button {
   border: 0;
   border-radius: 0.5rem;
-  background: #2861a8;
-  color: #fff;
+  background: var(--dashboard-accent);
+  color: var(--dashboard-on-accent);
   padding: 0.65rem 0.85rem;
   font: inherit;
   cursor: pointer;

@@ -26,6 +26,8 @@ export class ProfileComponent {
   protected readonly pending = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly success = signal<string | null>(null);
+  protected readonly requiresPasswordChange =
+    this.authService.user()?.requires_password_change === true;
 
   constructor() {
     this.profileForm.controls.name.setValue(this.authService.user()?.name ?? '');
@@ -75,6 +77,13 @@ export class ProfileComponent {
     this.authService.changePassword(oldPassword, newPassword).subscribe({
       next: () => {
         this.passwordForm.reset();
+        this.authService.applyUser({
+          id: this.authService.user()?.id ?? 0,
+          email: this.authService.user()?.email ?? '',
+          name: this.authService.user()?.name,
+          role: this.authService.user()?.role,
+          requires_password_change: false,
+        });
         this.success.set('Password changed successfully');
         this.pending.set(false);
       },

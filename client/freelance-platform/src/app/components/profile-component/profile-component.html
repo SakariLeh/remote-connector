@@ -40,6 +40,11 @@
     </form>
 
     <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      @if (requiresPasswordChange) {
+        <p class="message error" role="alert">
+          Для продолжения необходимо сменить временный пароль.
+        </p>
+      }
       <label class="field">
         <span>Old password</span>
         <input type="password" formControlName="oldPassword" autocomplete="current-password" />
