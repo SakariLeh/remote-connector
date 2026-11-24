@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from backend_app.shared.querying import FilterClause, FilterLogic, SortClause
 from backend_app.tasks_microservice.DTO import TaskCreateDTO, TaskRequestDTO, TaskResponseDTO
 from backend_app.tasks_microservice.entities import TaskEntity
 from backend_app.tasks_microservice.repositories import TaskRepository
@@ -36,6 +37,23 @@ class TaskService:
 
     async def get_unassigned_tasks(self) -> list[TaskResponseDTO]:
         return list(await self.task_repo.get_unassigned_tasks())
+
+    async def query_open_tasks(
+        self,
+        *,
+        exclude_publisher_id: int,
+        clauses: list[FilterClause],
+        logic: FilterLogic,
+        sorts: list[SortClause],
+    ) -> list[TaskResponseDTO]:
+        return list(
+            await self.task_repo.query_open_tasks(
+                exclude_publisher_id=exclude_publisher_id,
+                clauses=clauses,
+                logic=logic,
+                sorts=sorts,
+            )
+        )
 
     async def update_task(self, dto: TaskRequestDTO) -> TaskResponseDTO:
         existing = await self.task_repo.get_task_entity_by_id(dto.id)

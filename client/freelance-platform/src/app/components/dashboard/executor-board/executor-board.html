@@ -21,7 +21,81 @@
     }
 
     <h2>{{ text.feedTitle }}</h2>
-    @if (feed().length === 0) {
+
+    <div class="feed-filters">
+      <h3>{{ text.filters.title }}</h3>
+
+      <fieldset class="filter-group">
+        <legend>{{ text.filters.categories }}</legend>
+        @if (categoriesError()) {
+          <p class="list-error" role="alert">{{ categoriesError() }}</p>
+        } @else if (categories().length === 0) {
+          <p class="list-status">{{ text.filters.categoriesLoading }}</p>
+        } @else {
+          <div class="category-options">
+            @for (category of categories(); track category.id) {
+              <label class="category-option">
+                <input
+                  type="checkbox"
+                  [checked]="isCategorySelected(category.id)"
+                  (change)="toggleCategory(category.id, $any($event.target).checked)"
+                />
+                <span>{{ category.name }}</span>
+              </label>
+            }
+          </div>
+        }
+      </fieldset>
+
+      <div class="filter-row">
+        <label>
+          {{ text.filters.priceFrom }}
+          <input
+            type="number"
+            min="0"
+            step="1"
+            [(ngModel)]="priceMin"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </label>
+        <label>
+          {{ text.filters.priceTo }}
+          <input
+            type="number"
+            min="0"
+            step="1"
+            [(ngModel)]="priceMax"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </label>
+      </div>
+
+      <div class="filter-row">
+        <label>
+          {{ text.filters.sort }}
+          <select [(ngModel)]="sortKey" [ngModelOptions]="{ standalone: true }">
+            <option value="created_at:desc">{{ text.filters.sortCreatedDesc }}</option>
+            <option value="price:asc">{{ text.filters.sortPriceAsc }}</option>
+            <option value="price:desc">{{ text.filters.sortPriceDesc }}</option>
+          </select>
+        </label>
+        <label>
+          {{ text.filters.logic }}
+          <select [(ngModel)]="filterLogic" [ngModelOptions]="{ standalone: true }">
+            <option value="and">{{ text.filters.logicAnd }}</option>
+            <option value="or">{{ text.filters.logicOr }}</option>
+          </select>
+        </label>
+      </div>
+
+      <button type="button" [disabled]="feedLoading()" (click)="applyFilters()">
+        {{ text.filters.apply }}
+      </button>
+    </div>
+
+    @if (feedLoading()) {
+      <p class="list-status">{{ text.loading }}</p>
+    } @else if (feed().length === 0) {
       <p class="list-status">{{ text.feedEmpty }}</p>
     } @else {
       <ul class="task-list">

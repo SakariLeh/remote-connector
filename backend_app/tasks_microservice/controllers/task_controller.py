@@ -7,6 +7,11 @@ from backend_app.shared.jwt_authentication import (
     get_current_user,
     require_auth,
 )
+from backend_app.shared.querying import (
+    parse_filter_params,
+    parse_logic,
+    parse_sort_params,
+)
 from backend_app.tasks_microservice.DTO import (
     TaskAssignmentResponseDTO,
     TaskCreateDTO,
@@ -73,6 +78,52 @@ async def get_unassigned_tasks(
     service: TaskService = Depends(_get_task_service),
 ) -> list[TaskResponseDTO]:
     return await service.get_unassigned_tasks()
+
+
+@require_auth
+@tasks_router.get(
+    "/filtered",
+    response_model=list[TaskResponseDTO],
+    status_code=status.HTTP_200_OK,
+    summary="Get filtered open tasks",
+    response_description="Open tasks matching filters (and optional sorts)",
+)
+async def get_filtered_tasks(
+    logic: str | None = Query(default="and"),
+    filters: list[str] | None = Query(default=None, alias="filter"),
+    sorts: list[str] | None = Query(default=None, alias="sort"),
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskService = Depends(_get_task_service),
+) -> list[TaskResponseDTO]:
+    return await service.query_open_tasks(
+        exclude_publisher_id=current_user.user_id,
+        clauses=parse_filter_params(filters),
+        logic=parse_logic(logic),
+        sorts=parse_sort_params(sorts),
+    )
+
+
+@require_auth
+@tasks_router.get(
+    "/sorted",
+    response_model=list[TaskResponseDTO],
+    status_code=status.HTTP_200_OK,
+    summary="Get sorted open tasks",
+    response_description="Open tasks with sorts (and optional filters)",
+)
+async def get_sorted_tasks(
+    logic: str | None = Query(default="and"),
+    filters: list[str] | None = Query(default=None, alias="filter"),
+    sorts: list[str] | None = Query(default=None, alias="sort"),
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskService = Depends(_get_task_service),
+) -> list[TaskResponseDTO]:
+    return await service.query_open_tasks(
+        exclude_publisher_id=current_user.user_id,
+        clauses=parse_filter_params(filters),
+        logic=parse_logic(logic),
+        sorts=parse_sort_params(sorts),
+    )
 
 
 @require_auth

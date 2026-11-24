@@ -1,10 +1,18 @@
 from typing import Sequence
 
-from sqlalchemy import Select, select, text
+from sqlalchemy import Select, desc, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend_app.shared.querying import (
+    FilterClause,
+    FilterLogic,
+    SortClause,
+    apply_filters,
+    apply_sorts,
+)
 from backend_app.tasks_microservice.DTO import TaskResponseDTO
 from backend_app.tasks_microservice.entities import TaskCategoryEntity, TaskEntity
+from backend_app.tasks_microservice.querying import task_query_fields
 
 
 def _to_response(task: TaskEntity, category_name: str) -> TaskResponseDTO:
@@ -53,6 +61,25 @@ class TaskRepository:
 
     async def get_unassigned_tasks(self) -> Sequence[TaskResponseDTO]:
         return await self._many(_with_category().where(TaskEntity.actor_id.is_(None)))
+
+    async def query_open_tasks(
+        self,
+        *,
+        exclude_publisher_id: int,
+        clauses: list[FilterClause],
+        logic: FilterLogic,
+        sorts: list[SortClause],
+    ) -> Sequence[TaskResponseDTO]:
+        stmt = _with_category().where(
+            TaskEntity.actor_id.is_(None),
+            TaskEntity.publisher_id != exclude_publisher_id,
+        )
+        fields = task_query_fields()
+        stmt = apply_filters(stmt, clauses, logic, fields)
+        stmt = apply_sorts(stmt, sorts, fields)
+        if not sorts:
+            stmt = stmt.order_by(desc(TaskEntity.created_at))
+        return await self._many(stmt)
 
     async def get_tasks_by_publisher_id(self, publisher_id: int) -> Sequence[TaskResponseDTO]:
         return await self._many(_with_category().where(TaskEntity.publisher_id == publisher_id))
