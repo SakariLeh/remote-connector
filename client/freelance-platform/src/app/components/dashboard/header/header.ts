@@ -97,7 +97,9 @@ export class HeaderComponent {
   readonly logout = (): void => this.auth.logout();
 
   search(query: string): void {
-    console.log(this.text.searchResults, query);
+    if (this.state.role() === 'executor') {
+      this.state.setCatalogSearch(query);
+    }
   }
 
   @HostListener('document:click', ['$event'])

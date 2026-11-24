@@ -1,6 +1,14 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
+
+export type FilterLogic = 'and' | 'or';
+
+export interface TaskQueryOptions {
+  logic?: FilterLogic;
+  filters?: string[];
+  sorts?: string[];
+}
 
 export type TaskStatus = 'new' | 'assigned' | 'in_progress' | 'completed' | 'rejected';
 
@@ -69,6 +77,18 @@ export class TaskService {
     return this.read(this.http.get<Task[]>('/tasks/unassigned'));
   }
 
+  filtered(options: TaskQueryOptions = {}): Observable<Task[]> {
+    return this.read(
+      this.http.get<Task[]>('/tasks/filtered', { params: this.toQueryParams(options) }),
+    );
+  }
+
+  sorted(options: TaskQueryOptions = {}): Observable<Task[]> {
+    return this.read(
+      this.http.get<Task[]>('/tasks/sorted', { params: this.toQueryParams(options) }),
+    );
+  }
+
   getTask(id: number): Observable<Task> {
     return this.read(this.http.get<Task>(`/tasks/${id}`));
   }
@@ -109,6 +129,20 @@ export class TaskService {
         params: taskId == null ? undefined : { task_id: String(taskId) },
       }),
     );
+  }
+
+  private toQueryParams(options: TaskQueryOptions): HttpParams {
+    let params = new HttpParams();
+    if (options.logic) {
+      params = params.set('logic', options.logic);
+    }
+    for (const filter of options.filters ?? []) {
+      params = params.append('filter', filter);
+    }
+    for (const sort of options.sorts ?? []) {
+      params = params.append('sort', sort);
+    }
+    return params;
   }
 
   private read<T>(source: Observable<T>): Observable<T> {
