@@ -45,6 +45,7 @@ class UserRepository:
             raise ValueError("email, hashed_password and role are required to create a user")
 
         user = UserEntity(
+            name=dto.name or "",
             email=dto.email,
             hashed_password=dto.hashed_password.get_secret_value(),
             role=dto.role,
@@ -66,6 +67,8 @@ class UserRepository:
 
         if dto.email is not None:
             user.email = dto.email
+        if dto.name is not None:
+            user.name = dto.name
         if dto.role is not None:
             user.role = dto.role
         if dto.hashed_password is not None:

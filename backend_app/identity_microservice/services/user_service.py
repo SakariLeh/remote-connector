@@ -39,6 +39,7 @@ class UserService:
         updated = await self.user_repo.update_user(
             UserCredentialsDTO(
                 id=user.id,
+                name=user.name,
                 email=user.email,
                 role=user.role,
                 hashed_password=hashed_password,
@@ -56,6 +57,7 @@ class UserService:
         updated = await self.user_repo.update_user(
             UserCredentialsDTO(
                 id=user_id,
+                name=dto.name,
                 email=dto.email,
                 role=None,
             )

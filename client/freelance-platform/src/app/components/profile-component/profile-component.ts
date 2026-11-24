@@ -15,6 +15,7 @@ export class ProfileComponent {
 
   protected readonly user: Signal<AuthUser | null> = this.authService.user;
   protected readonly profileForm = this.fb.nonNullable.group({
+    name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
   });
   protected readonly passwordForm = this.fb.nonNullable.group({
@@ -27,6 +28,7 @@ export class ProfileComponent {
   protected readonly success = signal<string | null>(null);
 
   constructor() {
+    this.profileForm.controls.name.setValue(this.authService.user()?.name ?? '');
     this.profileForm.controls.email.setValue(this.authService.user()?.email ?? '');
   }
 
@@ -36,12 +38,12 @@ export class ProfileComponent {
       return;
     }
 
-    const { email } = this.profileForm.getRawValue();
+    const { name, email } = this.profileForm.getRawValue();
     this.pending.set(true);
     this.error.set(null);
     this.success.set(null);
 
-    this.authService.updateProfile(email).subscribe({
+    this.authService.updateProfile(email, name).subscribe({
       next: (updatedUser) => {
         this.authService.user.set(updatedUser);
         this.success.set('Profile updated successfully');

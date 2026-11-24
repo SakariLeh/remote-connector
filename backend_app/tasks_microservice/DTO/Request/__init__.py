@@ -3,6 +3,7 @@ from .task_category_create_dto import TaskCategoryCreateDTO
 from .task_category_request_dto import TaskCategoryRequestDTO
 from .task_create_dto import TaskCreateDTO
 from .task_request_dto import TaskRequestDTO
+from .task_rating_request_dto import TaskRatingRequestDTO
 from .task_select_actor_dto import TaskSelectActorDTO
 
 __all__ = [
@@ -11,5 +12,6 @@ __all__ = [
     "TaskCategoryRequestDTO",
     "TaskCreateDTO",
     "TaskRequestDTO",
+    "TaskRatingRequestDTO",
     "TaskSelectActorDTO",
 ]

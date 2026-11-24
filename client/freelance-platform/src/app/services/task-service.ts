@@ -21,8 +21,10 @@ export interface Task {
 export interface TaskAssignment {
   id: number;
   actor_id: number;
+  actor_name: string;
   task_id: number;
   actor_status: number;
+  rating: number | null;
 }
 
 export interface PublisherView {
@@ -92,6 +94,12 @@ export class TaskService {
   selectActor(taskId: number, actorId: number): Observable<TaskAssignment> {
     return this.read(
       this.http.post<TaskAssignment>(`/tasks/${taskId}/select-actor`, { actor_id: actorId }),
+    );
+  }
+
+  rateActor(taskId: number, rating: number): Observable<TaskAssignment> {
+    return this.read(
+      this.http.post<TaskAssignment>(`/tasks/${taskId}/rating`, { rating }),
     );
   }
 

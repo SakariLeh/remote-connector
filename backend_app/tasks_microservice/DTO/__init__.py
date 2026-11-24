@@ -4,6 +4,7 @@ from .Request import (
     TaskCategoryRequestDTO,
     TaskCreateDTO,
     TaskRequestDTO,
+    TaskRatingRequestDTO,
     TaskSelectActorDTO,
 )
 from .Response import (
@@ -22,6 +23,7 @@ __all__ = [
     "TaskCreateDTO",
     "TaskPublisherViewDTO",
     "TaskRequestDTO",
+    "TaskRatingRequestDTO",
     "TaskResponseDTO",
     "TaskSelectActorDTO",
 ]

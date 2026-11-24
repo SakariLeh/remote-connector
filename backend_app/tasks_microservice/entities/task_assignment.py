@@ -13,3 +13,4 @@ class TaskAssignmentEntity(Base):
     task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), nullable=False, index=True)
     # 1 - согласился выполнить, 2 - отказался после согласия, 3(необязательно) - выполнил задачу
     actor_status: Mapped[int] = mapped_column(Integer, nullable=False)
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)

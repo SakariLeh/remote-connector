@@ -64,6 +64,10 @@ export class TaskComponent implements OnInit {
     this.run(this.tasksApi.selectActor(taskId, actorId), taskId);
   }
 
+  protected rateActor(taskId: number, rating: number): void {
+    this.run(this.tasksApi.rateActor(taskId, rating), taskId);
+  }
+
   protected setStatus(taskId: number, status: TaskStatus): void {
     this.run(this.tasksApi.update({ id: taskId, status }), taskId);
   }

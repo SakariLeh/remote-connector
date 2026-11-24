@@ -27,6 +27,7 @@ class IdentityService:
         hashed_pass = self.ph.hash(dto.password)
         created_user = await self.user_repo.create_user(
             UserCredentialsDTO(
+                name=dto.name,
                 email=dto.email,
                 hashed_password=SecretStr(hashed_pass),
                 role=dto.role,

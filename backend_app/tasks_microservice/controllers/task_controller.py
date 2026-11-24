@@ -13,6 +13,7 @@ from backend_app.tasks_microservice.DTO import (
     TaskPublisherViewDTO,
     TaskRequestDTO,
     TaskResponseDTO,
+    TaskRatingRequestDTO,
     TaskSelectActorDTO,
 )
 from backend_app.tasks_microservice.db_context import get_db
@@ -172,6 +173,25 @@ async def select_actor(
 ) -> TaskAssignmentResponseDTO:
     try:
         return await service.select_actor(task_id, current_user.user_id, dto.actor_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+
+@require_auth
+@tasks_router.post(
+    "/{task_id}/rating",
+    response_model=TaskAssignmentResponseDTO,
+    status_code=status.HTTP_200_OK,
+    summary="Rate selected task actor",
+)
+async def rate_actor(
+    task_id: int,
+    dto: TaskRatingRequestDTO,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: TaskAssignmentService = Depends(_get_task_assignment_service),
+) -> TaskAssignmentResponseDTO:
+    try:
+        return await service.rate_actor(task_id, current_user.user_id, dto)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 

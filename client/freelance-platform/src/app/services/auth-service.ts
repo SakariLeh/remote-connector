@@ -2,12 +2,13 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, switchMap, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, switchMap, tap, throwError } from 'rxjs';
 
 const STORAGE_KEY = 'fp_auth';
 
 export interface AuthUser {
   id: number;
+  name?: string;
   email: string;
   role?: string;
 }
@@ -42,12 +43,18 @@ export class AuthService {
       .post<JwtResponse>('/auth/authorize', { email, password })
       .pipe(
         tap((res) => this.persist(res)),
+        switchMap((res) =>
+          this.http.get<AuthUser>('/auth/me').pipe(
+            tap((user) => this.applyUser(user)),
+            map(() => res),
+          ),
+        ),
         catchError((err) => throwError(() => this.toMessage(err))),
       );
   }
 
-  register(email: string, password: string): Observable<JwtResponse> {
-    return this.http.post('/auth/register', { email, password }).pipe(
+  register(email: string, password: string, name = ''): Observable<JwtResponse> {
+    return this.http.post('/auth/register', { name, email, password }).pipe(
       switchMap(() => this.login(email, password)),
       catchError((err) => {
         if (typeof err === 'string') {
@@ -58,8 +65,8 @@ export class AuthService {
     );
   }
 
-  updateProfile(email: string): Observable<AuthUser> {
-    return this.http.post<AuthUser>('/profile/update', { email }).pipe(
+  updateProfile(email: string, name = ''): Observable<AuthUser> {
+    return this.http.post<AuthUser>('/profile/update', { name, email }).pipe(
       tap((user) => this.applyUser(user)),
       catchError((err) => throwError(() => this.toMessage(err))),
     );

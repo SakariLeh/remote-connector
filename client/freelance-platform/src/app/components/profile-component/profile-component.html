@@ -12,6 +12,13 @@
 
     <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
       <label class="field">
+        <span>Name</span>
+        <input type="text" formControlName="name" autocomplete="name" />
+        @if (profileForm.controls.name.touched && profileForm.controls.name.invalid) {
+          <small class="field-error">Enter your name.</small>
+        }
+      </label>
+      <label class="field">
         <span>Email address</span>
         <input type="email" formControlName="email" autocomplete="email" />
         @if (profileForm.controls.email.touched && profileForm.controls.email.invalid) {

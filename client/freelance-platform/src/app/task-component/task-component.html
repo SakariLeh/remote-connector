@@ -41,11 +41,29 @@
         <ul class="responses">
           @for (row of assignments(); track row.id) {
             <li>
-              <span>Исполнитель #{{ row.actor_id }} · {{ actorStatusLabel[row.actor_status] }}</span>
+              <span>{{ row.actor_name || ('Исполнитель #' + row.actor_id) }} · {{ actorStatusLabel[row.actor_status] }}</span>
+              @if (row.rating != null) {
+                <span>Оценка: {{ row.rating }}/5</span>
+              }
               @if (row.actor_status === 1 && selected.actor_id !== row.actor_id) {
                 <button type="button" [disabled]="pending()" (click)="selectActor(selected.id, row.actor_id)">
                   Выбрать
                 </button>
+              }
+              @if (selected.actor_id === row.actor_id) {
+                <select
+                  [value]="row.rating ?? ''"
+                  [disabled]="pending()"
+                  (change)="rateActor(selected.id, +$any($event.target).value)"
+                  aria-label="Оценка исполнителя"
+                >
+                  <option value="" disabled>Оценить</option>
+                  <option [value]="1">1</option>
+                  <option [value]="2">2</option>
+                  <option [value]="3">3</option>
+                  <option [value]="4">4</option>
+                  <option [value]="5">5</option>
+                </select>
               }
             </li>
           }

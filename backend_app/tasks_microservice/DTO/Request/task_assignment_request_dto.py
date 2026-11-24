@@ -7,6 +7,7 @@ class TaskAssignmentRequestDTO(BaseModel):
     actor_id: int | None = None
     task_id: int | None = None
     actor_status: int | None = None
+    rating: int | None = None
 
 # actor_status - 2, actor_id - 3 | В результате получим список заданий, от которых отказался пользователь с id 3
 # actor_status - 2, task_id - 1 | В результате получим список id пользователей, которые отказались от задания с id 1

@@ -71,9 +71,11 @@ async def change_password(dto: ChangePasswordDTO, current_user: CurrentUser = De
 
 @require_roles("user", "admin")
 @auth_router.get("/me", response_model=UserResponseDTO, status_code=status.HTTP_200_OK, summary="Get current user profile", response_description="Current user profile")
-async def get_current_user_profile(current_user: CurrentUser = Depends(get_current_user)) -> UserResponseDTO:
-    return UserResponseDTO(
-        id=current_user.user_id,
-        email=current_user.email,
-        role=current_user.role,
-    )
+async def get_current_user_profile(
+    current_user: CurrentUser = Depends(get_current_user),
+    service: IdentityService = Depends(_get_identity_service),
+) -> UserResponseDTO:
+    user = await service.user_repo.get_user_by_id(current_user.user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user

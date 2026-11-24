@@ -4,6 +4,7 @@ from backend_app.tasks_microservice.DTO import (
     TaskAssignmentRequestDTO,
     TaskAssignmentResponseDTO,
     TaskPublisherViewDTO,
+    TaskRatingRequestDTO,
 )
 from backend_app.tasks_microservice.entities import TaskAssignmentEntity
 from backend_app.tasks_microservice.repositories import (
@@ -84,7 +85,33 @@ class TaskAssignmentService:
         task.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
         await self.task_repo.update_task(task)
 
-        return TaskAssignmentResponseDTO.model_validate(assignment)
+        response = await self.task_assignment_repo.get_task_assignment_by_id(assignment.id)
+        if response is None:
+            raise ValueError("Assignment could not be loaded")
+        return response
+
+    async def rate_actor(
+        self,
+        task_id: int,
+        publisher_id: int,
+        dto: TaskRatingRequestDTO,
+    ) -> TaskAssignmentResponseDTO:
+        task = await self.task_repo.get_task_entity_by_id(task_id)
+        if not task:
+            raise ValueError("Task not found")
+        if task.publisher_id != publisher_id:
+            raise ValueError("Only publisher can rate the actor")
+        if task.actor_id is None:
+            raise ValueError("Task has no selected actor")
+
+        assignment = await self.task_assignment_repo.get_task_assignment_entity(
+            task.actor_id, task_id
+        )
+        if not assignment:
+            raise ValueError("Assignment not found")
+
+        assignment.rating = dto.rating
+        return await self.task_assignment_repo.update_task_assignment(assignment)
 
     async def get_my_assignments(
         self,
